@@ -8,3 +8,13 @@ Whoever wants to track their expenses, but mostly aiming for the international s
 
 ## What problem does it solve?
 Sometimes I forgot important events that I need to expense little bit lot. If I can adjust it in my budget planner already, I won't have any problem.
+
+## Questions I still need to answer
+
+There are several things I have not decided yet:
+
+Should the budget reset automatically every month?
+Should users be able to create their own expense categories?
+What is the simplest way to display spending so that it is easy to understand?
+Should the application support multiple currencies?
+Should users be able to set savings goals?
