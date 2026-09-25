@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <h1>Budget Planner</h1>
+    <p class="month-label">Month: <span id="current-month"></span></p>
+
+    <section id="income-section">
+      <h2>Income</h2>
+      <label class="field">
+        Monthly income
+        <input type="number" id="income-input" min="0" step="0.01" placeholder="0">
+      </label>
+    </section>
+
+    <section id="mustpays-section">
+      <h2>Must-pay expenses</h2>
+      <label class="field">
+        Rent
+        <input type="number" id="rent-input" min="0" step="0.01" placeholder="0">
+      </label>
+      <label class="field">
+        Phone
+        <input type="number" id="phone-input" min="0" step="0.01" placeholder="0">
+      </label>
+      <label class="field">
+        Transport
+        <input type="number" id="transport-input" min="0" step="0.01" placeholder="0">
+      </label>
+      <p class="left-to-plan">Left to plan: <span id="left-to-plan">0</span></p>
+    </section>
+
+    <section id="planning-section">
+      <h2>Plan your categories</h2>
+      <div id="category-plan-list"></div>
+    </section>
+
+    <section id="expense-section">
+      <h2>Record an expense</h2>
+      <label class="field">
+        Category
+        <select id="expense-category"></select>
+      </label>
+      <label class="field">
+        Amount
+        <input type="number" id="expense-amount" min="0" step="0.01" placeholder="0">
+      </label>
+      <button id="add-expense-btn" type="button">Add expense</button>
+    </section>
+
+    <section id="summary-section">
+      <h2>Spending summary</h2>
+      <div id="category-summary-list"></div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
