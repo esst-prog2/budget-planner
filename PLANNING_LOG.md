@@ -11,3 +11,5 @@
 2026-09-25 — Named the OpenSpec change "add-mvp" and split it into three capabilities: budget-setup, expense-tracking, monthly-reset — decided by: agent
 2026-09-25 — Design: negative leftover carries into the next month unclamped (not floored at zero), shown plainly to the user — decided by: agent
 2026-09-25 — Backlog for later weeks (not built this term): multiple currencies, real savings goals, custom categories, push notifications, planning future one-off events, duplicate-income confirmation, smarter category suggestions, pre-filled must-pays from the previous month — decided by: user
+2026-10-02 — Spike (issue #3, branch hw4-spike): question is whether a real month of my own spending (all of September, bank statement plus reconstructed cash) fits the six fixed categories — decided by: user
+2026-10-02 — Spike answer criterion: the share of flexible September spending that lands in "Other" plus the count of items I had to guess at; if about a third or more lands in Other, six fixed categories is the wrong design. Only counts and shares go in the log, no amounts or merchant names — decided by: user
