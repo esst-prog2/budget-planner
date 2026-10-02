@@ -43,7 +43,7 @@ Recording an expense means picking one of the six fixed categories from a list; 
 On load, compare the stored `month` to the real current `YYYY-MM`. If they differ, compute leftover from the stored month and start a new month object (see `monthly-reset` spec). No background timers or scheduled jobs — the page only runs while a tab is open, and there is no notification feature this term that would need one.
 
 **Leftover carries through unclamped, including if negative.**
-Leftover = income − must-pays − sum of actual spending across all six flexible categories. If the user overspent past their income, leftover is negative and next month's starting income is reduced accordingly, displayed plainly. Alternative considered: clamping leftover at zero — rejected for now, since hiding an overspend would misrepresent the user's real financial position; this can be revisited after trying it.
+Leftover = income − must-pays − sum of actual spending across all six flexible categories. If the user overspent past their income, leftover is negative and next month's carried-over amount is negative, reducing what is left to plan, displayed plainly. Alternative considered: clamping leftover at zero — rejected for now, since hiding an overspend would misrepresent the user's real financial position; this can be revisited after trying it.
 
 ## Risks / Trade-offs
 

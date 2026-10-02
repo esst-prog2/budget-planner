@@ -19,10 +19,10 @@ The system SHALL let the user enter amounts for exactly three fixed must-pay exp
 - **THEN** the system stores each amount against its fixed must-pay label
 
 ### Requirement: Show remaining amount after must-pays
-The system SHALL calculate and display the amount left to plan as income minus the sum of the three must-pay expenses.
+The system SHALL calculate and display the amount left to plan as the carried-over amount from the previous month plus income minus the sum of the three must-pay expenses.
 
 #### Scenario: Remaining amount example
-- **WHEN** income is 1200 and must-pays are rent 650, phone 20, and transport 49
+- **WHEN** the carried-over amount is 0, income is 1200, and must-pays are rent 650, phone 20, and transport 49
 - **THEN** the system shows 481 as the amount left to plan
 
 ### Requirement: Fixed flexible categories

@@ -26,6 +26,7 @@ function makeEmptyCategories() {
 function makeEmptyState(month) {
   return {
     month,
+    carryOver: 0,
     income: 0,
     mustPays: { rent: 0, phone: 0, transport: 0 },
     categories: makeEmptyCategories(),
@@ -42,6 +43,9 @@ function loadState() {
     if (!parsed || typeof parsed !== 'object') {
       return makeEmptyState(getCurrentMonthStr());
     }
+    if (typeof parsed.carryOver !== 'number') {
+      parsed.carryOver = 0;
+    }
     return parsed;
   } catch (err) {
     return makeEmptyState(getCurrentMonthStr());
@@ -55,7 +59,7 @@ function saveState(state) {
 function computeLeftover(state) {
   const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
   const actualTotal = CATEGORY_ORDER.reduce((sum, key) => sum + state.categories[key].actual, 0);
-  return state.income - mustPayTotal - actualTotal;
+  return state.carryOver + state.income - mustPayTotal - actualTotal;
 }
 
 function checkAndResetMonth(state) {
@@ -65,7 +69,7 @@ function checkAndResetMonth(state) {
   }
   const leftover = computeLeftover(state);
   const newState = makeEmptyState(current);
-  newState.income = leftover;
+  newState.carryOver = leftover;
   saveState(newState);
   return newState;
 }
@@ -82,6 +86,7 @@ function renderMonth() {
 }
 
 function renderIncomeAndMustPays() {
+  document.getElementById('carry-over').textContent = state.carryOver.toFixed(2).replace(/\.00$/, '');
   document.getElementById('income-input').value = numOrEmpty(state.income);
   document.getElementById('rent-input').value = numOrEmpty(state.mustPays.rent);
   document.getElementById('phone-input').value = numOrEmpty(state.mustPays.phone);
@@ -90,7 +95,7 @@ function renderIncomeAndMustPays() {
 
 function renderLeftToPlan() {
   const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
-  const left = state.income - mustPayTotal;
+  const left = state.carryOver + state.income - mustPayTotal;
   document.getElementById('left-to-plan').textContent = left.toFixed(2).replace(/\.00$/, '');
 }
 
