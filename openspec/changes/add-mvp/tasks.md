@@ -27,8 +27,8 @@
 ## 5. Monthly reset
 
 - [x] 5.1 On page load, compare the stored `state.month` to the real current `YYYY-MM` and verify no reset happens when they match
-- [x] 5.2 When they differ, compute leftover as income minus the sum of must-pays minus the sum of all six categories' actual spending, and verify the calculation against a manual example, including a case where leftover is negative
-- [x] 5.3 Start a new state for the new month: must-pays and all six categories reset to empty, income set to the computed leftover, month set to the new `YYYY-MM`, and verify a simulated month change (e.g. by editing the stored month value) produces exactly this result
+- [x] 5.2 When they differ, compute leftover as carried-over amount plus income minus the sum of must-pays minus the sum of all six categories' actual spending, and verify the calculation against a manual example, including a case where leftover is negative
+- [x] 5.3 Start a new state for the new month: income, must-pays and all six categories reset to empty, carried-over amount set to the computed leftover (shown separately and added to income in "left to plan"), month set to the new `YYYY-MM`, and verify a simulated month change (e.g. by editing the stored month value) produces exactly this result
 - [x] 5.4 Save the new month's state to `localStorage` immediately after reset and verify it persists across a subsequent refresh
 
 ## 6. End-to-end verification
