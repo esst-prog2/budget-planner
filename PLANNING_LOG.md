@@ -28,3 +28,5 @@
 2026-10-09 — Test test/full-month.test.js enters every planted row through the app's Add expense button and compares each category total with the hand count; expected numbers are written in the test, not computed from the app — decided by: agent
 2026-10-09 — Red run: changed one line in app.js so Other expenses are added to Food; `node --test test/full-month.test.js` failed 1 of 3 ("food total: 26860 !== 13360") — decided by: agent
 2026-10-09 — Green run: put the line back; `node --test` passes 11 of 11 (8 rollover + 3 full-month) — decided by: agent
+2026-10-09 — Real use, expectation written before running: October income 300000, must-pays 130000 -> expect 170000 left to plan; food plan 80000, food expense 90000 -> expect a warning that Food is 10000 over plan — decided by: user
+2026-10-09 — Real use, result: left to plan showed 170000 and adding the 90000 food expense showed "Food: 10000 over plan" in red; both match the expectation, so no new test or bug from this run. Still untried: entering a real full month with cash in the app — decided by: user
