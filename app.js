@@ -33,6 +33,39 @@ function makeEmptyState(month) {
   };
 }
 
+// Money is kept in whole cents so that 0.1 + 0.2 adds up to exactly 0.3.
+function roundCents(value) {
+  return Math.round(value * 100) / 100;
+}
+
+// Reads an amount the user typed; anything that is not a positive number counts as 0.
+function parseAmount(text) {
+  const value = parseFloat(text);
+  return Number.isFinite(value) && value > 0 ? roundCents(value) : 0;
+}
+
+function numberOr(value, fallback) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+// Copies saved data onto a fresh state, so a missing or broken field becomes 0
+// instead of crashing the app.
+function normaliseState(parsed) {
+  const state = makeEmptyState(typeof parsed.month === 'string' ? parsed.month : getCurrentMonthStr());
+  state.carryOver = numberOr(parsed.carryOver, 0);
+  state.income = numberOr(parsed.income, 0);
+  const mustPays = parsed.mustPays || {};
+  Object.keys(state.mustPays).forEach((key) => {
+    state.mustPays[key] = numberOr(mustPays[key], 0);
+  });
+  const categories = parsed.categories || {};
+  CATEGORY_ORDER.forEach((key) => {
+    const saved = categories[key] || {};
+    state.categories[key] = { plan: numberOr(saved.plan, 0), actual: numberOr(saved.actual, 0) };
+  });
+  return state;
+}
+
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
@@ -43,10 +76,7 @@ function loadState() {
     if (!parsed || typeof parsed !== 'object') {
       return makeEmptyState(getCurrentMonthStr());
     }
-    if (typeof parsed.carryOver !== 'number') {
-      parsed.carryOver = 0;
-    }
-    return parsed;
+    return normaliseState(parsed);
   } catch (err) {
     return makeEmptyState(getCurrentMonthStr());
   }
@@ -59,7 +89,7 @@ function saveState(state) {
 function computeLeftover(state) {
   const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
   const actualTotal = CATEGORY_ORDER.reduce((sum, key) => sum + state.categories[key].actual, 0);
-  return state.carryOver + state.income - mustPayTotal - actualTotal;
+  return roundCents(state.carryOver + state.income - mustPayTotal - actualTotal);
 }
 
 function checkAndResetMonth(state) {
@@ -118,7 +148,7 @@ function renderCategoryPlanInputs() {
     input.id = `plan-${key}`;
     input.value = numOrEmpty(state.categories[key].plan);
     input.addEventListener('input', () => {
-      state.categories[key].plan = parseFloat(input.value) || 0;
+      state.categories[key].plan = parseAmount(input.value);
       saveState(state);
       renderCategorySummary();
     });
@@ -190,25 +220,25 @@ function renderAll() {
 }
 
 document.getElementById('income-input').addEventListener('input', (e) => {
-  state.income = parseFloat(e.target.value) || 0;
+  state.income = parseAmount(e.target.value);
   saveState(state);
   renderLeftToPlan();
 });
 
 document.getElementById('rent-input').addEventListener('input', (e) => {
-  state.mustPays.rent = parseFloat(e.target.value) || 0;
+  state.mustPays.rent = parseAmount(e.target.value);
   saveState(state);
   renderLeftToPlan();
 });
 
 document.getElementById('phone-input').addEventListener('input', (e) => {
-  state.mustPays.phone = parseFloat(e.target.value) || 0;
+  state.mustPays.phone = parseAmount(e.target.value);
   saveState(state);
   renderLeftToPlan();
 });
 
 document.getElementById('transport-input').addEventListener('input', (e) => {
-  state.mustPays.transport = parseFloat(e.target.value) || 0;
+  state.mustPays.transport = parseAmount(e.target.value);
   saveState(state);
   renderLeftToPlan();
 });
@@ -216,11 +246,11 @@ document.getElementById('transport-input').addEventListener('input', (e) => {
 document.getElementById('add-expense-btn').addEventListener('click', () => {
   const category = document.getElementById('expense-category').value;
   const amountInput = document.getElementById('expense-amount');
-  const amount = parseFloat(amountInput.value) || 0;
+  const amount = parseAmount(amountInput.value);
   if (amount <= 0) {
     return;
   }
-  state.categories[category].actual += amount;
+  state.categories[category].actual = roundCents(state.categories[category].actual + amount);
   saveState(state);
   amountInput.value = '';
   renderCategorySummary();
