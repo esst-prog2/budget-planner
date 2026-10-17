@@ -9,9 +9,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-
-const APP_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
-const STORAGE_KEY = 'budgetPlanner:v1';
+const { openApp } = require('../test-support/fake-browser');
 
 // Counted by hand by the user (see PLANNING_LOG.md, 2026-10-09).
 const EXPECTED = {
@@ -22,43 +20,6 @@ const EXPECTED = {
   clothes: 15000,
   other: 13500,
 };
-
-function fakeElement() {
-  return {
-    value: '',
-    textContent: '',
-    innerHTML: '',
-    className: '',
-    style: {},
-    handlers: {},
-    addEventListener(type, handler) { this.handlers[type] = handler; },
-    appendChild() {},
-    setAttribute() {},
-  };
-}
-
-function openEmptyApp() {
-  const store = {};
-  const localStorage = {
-    getItem: (key) => (key in store ? store[key] : null),
-    setItem: (key, value) => { store[key] = value; },
-  };
-  const elements = {};
-  const document = {
-    getElementById: (id) => elements[id] || (elements[id] = fakeElement()),
-    createElement: () => fakeElement(),
-  };
-  new Function('localStorage', 'document', APP_SOURCE)(localStorage, document);
-
-  return {
-    saved: () => JSON.parse(store[STORAGE_KEY]),
-    addExpense(category, amount) {
-      document.getElementById('expense-category').value = category;
-      document.getElementById('expense-amount').value = String(amount);
-      document.getElementById('add-expense-btn').handlers.click();
-    },
-  };
-}
 
 function readPlantedMonth() {
   const lines = fs.readFileSync(path.join(__dirname, 'full-month-planted.csv'), 'utf8')
@@ -74,7 +35,7 @@ test('planted month includes cash expenses', () => {
 });
 
 test('a full month, cash included, lands in the categories counted by hand', () => {
-  const app = openEmptyApp();
+  const app = openApp();
   readPlantedMonth().forEach((row) => app.addExpense(row.category, row.amount));
 
   const { categories } = app.saved();
@@ -84,7 +45,7 @@ test('a full month, cash included, lands in the categories counted by hand', () 
 });
 
 test('Other stays under the one-third line from the spike', () => {
-  const app = openEmptyApp();
+  const app = openApp();
   readPlantedMonth().forEach((row) => app.addExpense(row.category, row.amount));
 
   const { categories } = app.saved();
