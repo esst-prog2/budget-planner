@@ -30,3 +30,4 @@
 2026-10-09 — Green run: put the line back; `node --test` passes 11 of 11 (8 rollover + 3 full-month) — decided by: agent
 2026-10-09 — Real use, expectation written before running: October income 300000, must-pays 130000 -> expect 170000 left to plan; food plan 80000, food expense 90000 -> expect a warning that Food is 10000 over plan — decided by: user
 2026-10-09 — Real use, result: left to plan showed 170000 and adding the 90000 food expense showed "Food: 10000 over plan" in red; both match the expectation, so no new test or bug from this run. Still untried: entering a real full month with cash in the app — decided by: user
+2026-10-17 — HW6 review 1 (security and privacy): no private data in history; summary header switched from innerHTML to textContent; findings kept in REVIEW.md — decided by: agent

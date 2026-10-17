@@ -150,7 +150,12 @@ function renderCategorySummary() {
 
     const header = document.createElement('div');
     header.className = 'summary-header';
-    header.innerHTML = `<span>${CATEGORY_LABELS[key]}</span><span>${actual.toFixed(2).replace(/\.00$/, '')} / ${plan.toFixed(2).replace(/\.00$/, '')}</span>`;
+    const name = document.createElement('span');
+    name.textContent = CATEGORY_LABELS[key];
+    const amounts = document.createElement('span');
+    amounts.textContent = `${actual.toFixed(2).replace(/\.00$/, '')} / ${plan.toFixed(2).replace(/\.00$/, '')}`;
+    header.appendChild(name);
+    header.appendChild(amounts);
 
     const track = document.createElement('div');
     track.className = 'progress-track';
