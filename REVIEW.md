@@ -23,3 +23,15 @@ Looked at: every calculation and input handler in `app.js`. Each suspected bug w
 | Floating-point drift: plan 0.6, expenses 0.1 + 0.2 + 0.3 gave 0.6000000000000001 and a red "Food: 0 over plan" while exactly on plan | Fixed: amounts and the leftover are rounded to cents (`roundCents`) |
 | Saved data with any field missing (older version, hand edit) crashed the app on load (`Cannot read properties of undefined (reading 'rent')`), leaving an empty page | Fixed: `normaliseState` copies saved data onto a fresh state; missing or broken fields become 0 |
 | The new month is detected only when the page is opened; a tab left open across the month change keeps the old month until reload | Not changed: the spec says "when the user opens the app". Known limitation |
+
+## 3. Spec conformance
+
+Looked at: `app.js` against the three specs in `openspec/changes/add-mvp/specs/`, plus `design.md` and `README.md`.
+
+| Finding | Action |
+| --- | --- |
+| Code matches every spec requirement checked: left to plan (481 example), six fixed categories with empty plans, "Food: 15 over plan" wording, carry-over formula, skipped months, negative leftover | None needed |
+| `design.md` state schema and leftover formula left out the carried-over amount added in HW4 | Fixed: `carryOver` added to both |
+| README still described the early idea: the app "suggests" plan amounts (spec: starts empty), "sends notifications" (it shows an in-app warning), leftover goes "into savings" (it is carried over); open questions already decided; "Other" missing from the category list; no instructions to run the app or tests | Fixed: those facts corrected, a "Run it" section added; the rest of the wording kept |
+| `tasks.md` 3.3 describes left to plan without the carry-over | Not changed: it records what was done at the time; the spec is the source of truth |
+| The two README/spec examples (481 left, "Food: 15 over plan") had no automated test | Moved to review 4 |
