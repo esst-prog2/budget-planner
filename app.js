@@ -33,6 +33,44 @@ function makeEmptyState(month) {
   };
 }
 
+// Money is kept in whole cents so that 0.1 + 0.2 adds up to exactly 0.3.
+function roundCents(value) {
+  return Math.round(value * 100) / 100;
+}
+
+// Reads an amount the user typed; anything that is not a positive number counts as 0.
+function parseAmount(text) {
+  const value = parseFloat(text);
+  return Number.isFinite(value) && value > 0 ? roundCents(value) : 0;
+}
+
+// Shows an amount with cents only when it has some: 481, but 12.5 -> 12.50.
+function formatAmount(value) {
+  return value.toFixed(2).replace(/\.00$/, '');
+}
+
+function numberOr(value, fallback) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+// Copies saved data onto a fresh state, so a missing or broken field becomes 0
+// instead of crashing the app.
+function normaliseState(parsed) {
+  const state = makeEmptyState(typeof parsed.month === 'string' ? parsed.month : getCurrentMonthStr());
+  state.carryOver = numberOr(parsed.carryOver, 0);
+  state.income = numberOr(parsed.income, 0);
+  const mustPays = parsed.mustPays || {};
+  Object.keys(state.mustPays).forEach((key) => {
+    state.mustPays[key] = numberOr(mustPays[key], 0);
+  });
+  const categories = parsed.categories || {};
+  CATEGORY_ORDER.forEach((key) => {
+    const saved = categories[key] || {};
+    state.categories[key] = { plan: numberOr(saved.plan, 0), actual: numberOr(saved.actual, 0) };
+  });
+  return state;
+}
+
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
@@ -43,10 +81,7 @@ function loadState() {
     if (!parsed || typeof parsed !== 'object') {
       return makeEmptyState(getCurrentMonthStr());
     }
-    if (typeof parsed.carryOver !== 'number') {
-      parsed.carryOver = 0;
-    }
-    return parsed;
+    return normaliseState(parsed);
   } catch (err) {
     return makeEmptyState(getCurrentMonthStr());
   }
@@ -56,10 +91,14 @@ function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function sumMustPays(state) {
+  return state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
+}
+
 function computeLeftover(state) {
-  const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
+  const mustPayTotal = sumMustPays(state);
   const actualTotal = CATEGORY_ORDER.reduce((sum, key) => sum + state.categories[key].actual, 0);
-  return state.carryOver + state.income - mustPayTotal - actualTotal;
+  return roundCents(state.carryOver + state.income - mustPayTotal - actualTotal);
 }
 
 function checkAndResetMonth(state) {
@@ -86,7 +125,7 @@ function renderMonth() {
 }
 
 function renderIncomeAndMustPays() {
-  document.getElementById('carry-over').textContent = state.carryOver.toFixed(2).replace(/\.00$/, '');
+  document.getElementById('carry-over').textContent = formatAmount(state.carryOver);
   document.getElementById('income-input').value = numOrEmpty(state.income);
   document.getElementById('rent-input').value = numOrEmpty(state.mustPays.rent);
   document.getElementById('phone-input').value = numOrEmpty(state.mustPays.phone);
@@ -94,9 +133,8 @@ function renderIncomeAndMustPays() {
 }
 
 function renderLeftToPlan() {
-  const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
-  const left = state.carryOver + state.income - mustPayTotal;
-  document.getElementById('left-to-plan').textContent = left.toFixed(2).replace(/\.00$/, '');
+  const left = state.carryOver + state.income - sumMustPays(state);
+  document.getElementById('left-to-plan').textContent = formatAmount(left);
 }
 
 function renderCategoryPlanInputs() {
@@ -118,7 +156,7 @@ function renderCategoryPlanInputs() {
     input.id = `plan-${key}`;
     input.value = numOrEmpty(state.categories[key].plan);
     input.addEventListener('input', () => {
-      state.categories[key].plan = parseFloat(input.value) || 0;
+      state.categories[key].plan = parseAmount(input.value);
       saveState(state);
       renderCategorySummary();
     });
@@ -150,7 +188,12 @@ function renderCategorySummary() {
 
     const header = document.createElement('div');
     header.className = 'summary-header';
-    header.innerHTML = `<span>${CATEGORY_LABELS[key]}</span><span>${actual.toFixed(2).replace(/\.00$/, '')} / ${plan.toFixed(2).replace(/\.00$/, '')}</span>`;
+    const name = document.createElement('span');
+    name.textContent = CATEGORY_LABELS[key];
+    const amounts = document.createElement('span');
+    amounts.textContent = `${formatAmount(actual)} / ${formatAmount(plan)}`;
+    header.appendChild(name);
+    header.appendChild(amounts);
 
     const track = document.createElement('div');
     track.className = 'progress-track';
@@ -166,7 +209,7 @@ function renderCategorySummary() {
     if (actual > plan) {
       const warning = document.createElement('p');
       warning.className = 'warning';
-      const over = (actual - plan).toFixed(2).replace(/\.00$/, '');
+      const over = formatAmount(actual - plan);
       warning.textContent = `${CATEGORY_LABELS[key]}: ${over} over plan`;
       row.appendChild(warning);
     }
@@ -184,38 +227,29 @@ function renderAll() {
   renderCategorySummary();
 }
 
-document.getElementById('income-input').addEventListener('input', (e) => {
-  state.income = parseFloat(e.target.value) || 0;
-  saveState(state);
-  renderLeftToPlan();
-});
-
-document.getElementById('rent-input').addEventListener('input', (e) => {
-  state.mustPays.rent = parseFloat(e.target.value) || 0;
-  saveState(state);
-  renderLeftToPlan();
-});
-
-document.getElementById('phone-input').addEventListener('input', (e) => {
-  state.mustPays.phone = parseFloat(e.target.value) || 0;
-  saveState(state);
-  renderLeftToPlan();
-});
-
-document.getElementById('transport-input').addEventListener('input', (e) => {
-  state.mustPays.transport = parseFloat(e.target.value) || 0;
-  saveState(state);
-  renderLeftToPlan();
+// Income and the three must-pays: typing saves the amount and updates "left to plan".
+const AMOUNT_INPUTS = {
+  'income-input': (amount) => { state.income = amount; },
+  'rent-input': (amount) => { state.mustPays.rent = amount; },
+  'phone-input': (amount) => { state.mustPays.phone = amount; },
+  'transport-input': (amount) => { state.mustPays.transport = amount; },
+};
+Object.entries(AMOUNT_INPUTS).forEach(([id, store]) => {
+  document.getElementById(id).addEventListener('input', (e) => {
+    store(parseAmount(e.target.value));
+    saveState(state);
+    renderLeftToPlan();
+  });
 });
 
 document.getElementById('add-expense-btn').addEventListener('click', () => {
   const category = document.getElementById('expense-category').value;
   const amountInput = document.getElementById('expense-amount');
-  const amount = parseFloat(amountInput.value) || 0;
+  const amount = parseAmount(amountInput.value);
   if (amount <= 0) {
     return;
   }
-  state.categories[category].actual += amount;
+  state.categories[category].actual = roundCents(state.categories[category].actual + amount);
   saveState(state);
   amountInput.value = '';
   renderCategorySummary();
