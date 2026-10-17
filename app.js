@@ -44,6 +44,11 @@ function parseAmount(text) {
   return Number.isFinite(value) && value > 0 ? roundCents(value) : 0;
 }
 
+// Shows an amount with cents only when it has some: 481, but 12.5 -> 12.50.
+function formatAmount(value) {
+  return value.toFixed(2).replace(/\.00$/, '');
+}
+
 function numberOr(value, fallback) {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
@@ -86,8 +91,12 @@ function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function sumMustPays(state) {
+  return state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
+}
+
 function computeLeftover(state) {
-  const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
+  const mustPayTotal = sumMustPays(state);
   const actualTotal = CATEGORY_ORDER.reduce((sum, key) => sum + state.categories[key].actual, 0);
   return roundCents(state.carryOver + state.income - mustPayTotal - actualTotal);
 }
@@ -116,7 +125,7 @@ function renderMonth() {
 }
 
 function renderIncomeAndMustPays() {
-  document.getElementById('carry-over').textContent = state.carryOver.toFixed(2).replace(/\.00$/, '');
+  document.getElementById('carry-over').textContent = formatAmount(state.carryOver);
   document.getElementById('income-input').value = numOrEmpty(state.income);
   document.getElementById('rent-input').value = numOrEmpty(state.mustPays.rent);
   document.getElementById('phone-input').value = numOrEmpty(state.mustPays.phone);
@@ -124,9 +133,8 @@ function renderIncomeAndMustPays() {
 }
 
 function renderLeftToPlan() {
-  const mustPayTotal = state.mustPays.rent + state.mustPays.phone + state.mustPays.transport;
-  const left = state.carryOver + state.income - mustPayTotal;
-  document.getElementById('left-to-plan').textContent = left.toFixed(2).replace(/\.00$/, '');
+  const left = state.carryOver + state.income - sumMustPays(state);
+  document.getElementById('left-to-plan').textContent = formatAmount(left);
 }
 
 function renderCategoryPlanInputs() {
@@ -183,7 +191,7 @@ function renderCategorySummary() {
     const name = document.createElement('span');
     name.textContent = CATEGORY_LABELS[key];
     const amounts = document.createElement('span');
-    amounts.textContent = `${actual.toFixed(2).replace(/\.00$/, '')} / ${plan.toFixed(2).replace(/\.00$/, '')}`;
+    amounts.textContent = `${formatAmount(actual)} / ${formatAmount(plan)}`;
     header.appendChild(name);
     header.appendChild(amounts);
 
@@ -201,7 +209,7 @@ function renderCategorySummary() {
     if (actual > plan) {
       const warning = document.createElement('p');
       warning.className = 'warning';
-      const over = (actual - plan).toFixed(2).replace(/\.00$/, '');
+      const over = formatAmount(actual - plan);
       warning.textContent = `${CATEGORY_LABELS[key]}: ${over} over plan`;
       row.appendChild(warning);
     }
@@ -219,28 +227,19 @@ function renderAll() {
   renderCategorySummary();
 }
 
-document.getElementById('income-input').addEventListener('input', (e) => {
-  state.income = parseAmount(e.target.value);
-  saveState(state);
-  renderLeftToPlan();
-});
-
-document.getElementById('rent-input').addEventListener('input', (e) => {
-  state.mustPays.rent = parseAmount(e.target.value);
-  saveState(state);
-  renderLeftToPlan();
-});
-
-document.getElementById('phone-input').addEventListener('input', (e) => {
-  state.mustPays.phone = parseAmount(e.target.value);
-  saveState(state);
-  renderLeftToPlan();
-});
-
-document.getElementById('transport-input').addEventListener('input', (e) => {
-  state.mustPays.transport = parseAmount(e.target.value);
-  saveState(state);
-  renderLeftToPlan();
+// Income and the three must-pays: typing saves the amount and updates "left to plan".
+const AMOUNT_INPUTS = {
+  'income-input': (amount) => { state.income = amount; },
+  'rent-input': (amount) => { state.mustPays.rent = amount; },
+  'phone-input': (amount) => { state.mustPays.phone = amount; },
+  'transport-input': (amount) => { state.mustPays.transport = amount; },
+};
+Object.entries(AMOUNT_INPUTS).forEach(([id, store]) => {
+  document.getElementById(id).addEventListener('input', (e) => {
+    store(parseAmount(e.target.value));
+    saveState(state);
+    renderLeftToPlan();
+  });
 });
 
 document.getElementById('add-expense-btn').addEventListener('click', () => {

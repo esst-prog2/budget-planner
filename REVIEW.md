@@ -48,3 +48,17 @@ Looked at: `test/rollover.test.js`, `test/full-month.test.js`, `test/full-month-
 | The three bugs from review 2 had no regression tests | Fixed: one test each in `test/budget.test.js` |
 
 Red/green check: against the pre-review `app.js` (from `main`) the three regression tests fail and the three spec tests pass (those features already worked). With the warning switched off in `app.js`, the "Food: 15 over plan" test fails. With the reviewed `app.js`, `node --test` passes 17 of 17 (8 rollover + 3 full-month + 6 budget).
+
+## 5. Duplication and simplification
+
+Looked at: `app.js`, `style.css`, `spike/count-categories.js`. Done last, once review 4 had put tests on the screen output, so a refactor that changed behaviour would turn a test red.
+
+| Finding | Action |
+| --- | --- |
+| The money format `toFixed(2).replace(/\.00$/, '')` was written out 5 times | Fixed: one `formatAmount` helper |
+| The must-pay total was computed in two places that must agree (left to plan and leftover) | Fixed: one `sumMustPays` helper |
+| Four near-identical input listeners for income, rent, phone and transport | Fixed: one loop over a small table of inputs |
+| No unused CSS rules | None needed |
+| The six category keys are also listed in the spike script and in the test helper | Not changed: the spike is a stand-alone script, and the tests should not take their expected categories from the code they test |
+
+`node --test` passes 17 of 17 after the change.
