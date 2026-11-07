@@ -65,3 +65,11 @@ test('saved data with missing fields loads instead of crashing', () => {
   assert.deepStrictEqual(state.categories, categories());
   assert.strictEqual(app.shown('left-to-plan'), '1200');
 });
+
+test('saved text that is not valid JSON is kept, not overwritten, and the user is told', () => {
+  const app = openApp({ today: '2026-10-15', saved: '{broken' });
+  const kept = Object.values(app.storedAll()).includes('{broken');
+  assert.ok(kept, 'the unreadable text should still be in storage');
+  assert.strictEqual(app.saved().income, 0);
+  assert.match(app.shown('load-warning'), /could not be read/);
+});

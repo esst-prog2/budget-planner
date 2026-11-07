@@ -62,3 +62,14 @@ Looked at: `app.js`, `style.css`, `spike/count-categories.js`. Done last, once r
 | The six category keys are also listed in the spike script and in the test helper | Not changed: the spike is a stand-alone script, and the tests should not take their expected categories from the code they test |
 
 `node --test` passes 17 of 17 after the change.
+
+## 6. Follow-up from instructor feedback: errors that disappear
+
+Looked at: `loadState` in `app.js`, the one slide category no review had covered.
+
+| Finding | Action |
+| --- | --- |
+| If the saved text could not be parsed (hand edit, half-written save, future format change), the `catch` in `loadState` quietly returned an empty month and the very next `saveState(state)` wrote it over the old data. The budget was gone without a word. Valid JSON that is not an object (`null`, `42`) took the same path | Fixed: the unreadable text is copied to `budgetPlanner:v1:unreadable` before anything is saved, and a red message at the top says so and names that key |
+| No test for it | Fixed: a test in `test/budget.test.js` opens the app with `'{broken'` saved and checks the text is still in storage and the message is shown |
+
+Red/green check: the new test fails on the previous `app.js` ("the unreadable text should still be in storage") and passes after the fix; `node --test` passes 18 of 18.
