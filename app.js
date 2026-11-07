@@ -12,6 +12,11 @@ const CATEGORY_LABELS = {
   other: 'Other',
   unknown: 'Unknown',
 };
+// The budget is kept in HUF. An expense in another currency keeps its own
+// amount and is converted with the rate the user typed, always the current one.
+const BASE_CURRENCY = 'HUF';
+const CURRENCIES = ['HUF', 'MNT', 'EUR', 'USD'];
+
 // Where a history entry came from; "earlier" is spending saved before the
 // history existed, kept as one entry per category.
 const SOURCE_LABELS = {
@@ -19,6 +24,11 @@ const SOURCE_LABELS = {
   statement: 'statement',
   earlier: 'before history',
 };
+
+// Money is kept in whole cents so that 0.1 + 0.2 adds up to exactly 0.3.
+function roundCents(value) {
+  return Math.round(value * 100) / 100;
+}
 
 function getCurrentMonthStr() {
   const d = new Date();
@@ -61,12 +71,24 @@ function makeEmptyMonth(month) {
 }
 
 function makeEmptyState(month) {
-  return { ...makeEmptyMonth(month), pastMonths: [] };
+  // rates: HUF for one unit of each other currency; 0 until the user types it.
+  return { ...makeEmptyMonth(month), pastMonths: [], rates: { MNT: 0, EUR: 0, USD: 0 } };
 }
 
-// Money is kept in whole cents so that 0.1 + 0.2 adds up to exactly 0.3.
-function roundCents(value) {
-  return Math.round(value * 100) / 100;
+// Reads a rate the user typed; unlike money it is not rounded to cents
+// (1 MNT is about a tenth of a forint).
+function parseRate(text) {
+  const value = parseFloat(text);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function rateOf(currency, rates) {
+  return currency === BASE_CURRENCY ? 1 : rates[currency] || 0;
+}
+
+// The amount in HUF, or 0 while the currency has no rate yet.
+function toHuf(amount, currency, rates) {
+  return roundCents(amount * rateOf(currency, rates));
 }
 
 // Reads an amount the user typed; anything that is not a positive number counts as 0.
@@ -84,10 +106,12 @@ function numberOr(value, fallback) {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-function recomputeActuals(record) {
+// Each category's actual spending in HUF: the sum of its entries at today's rates.
+function recomputeActuals(record, rates) {
   CATEGORY_ORDER.forEach((key) => {
     const entries = record.entries.filter((entry) => entry.category === key);
-    record.categories[key].actual = roundCents(entries.reduce((sum, entry) => sum + entry.amount, 0));
+    const total = entries.reduce((sum, entry) => sum + toHuf(entry.amount, entry.currency, rates), 0);
+    record.categories[key].actual = roundCents(total);
   });
 }
 
@@ -115,13 +139,19 @@ function normaliseMonth(parsed, fallbackMonth) {
       time: typeof entry.time === 'string' ? entry.time : null,
       category: entry.category,
       amount: roundCents(entry.amount),
+      // Saved before currencies existed: statement amounts were in the
+      // statement's currency, everything else in HUF.
+      currency: CURRENCIES.includes(entry.currency) ? entry.currency
+        : entry.source === 'statement' ? STATEMENT_CURRENCY : BASE_CURRENCY,
       source: SOURCE_LABELS[entry.source] ? entry.source : 'typed',
     }));
   } else {
     // Saved before the history existed: each category total becomes one entry.
     CATEGORY_ORDER.forEach((key) => {
       const actual = numberOr((categories[key] || {}).actual, 0);
-      if (actual > 0) record.entries.push({ time: null, category: key, amount: actual, source: 'earlier' });
+      if (actual > 0) {
+        record.entries.push({ time: null, category: key, amount: actual, currency: BASE_CURRENCY, source: 'earlier' });
+      }
     });
   }
   if (Array.isArray(parsed.importedIds)) {
@@ -129,20 +159,24 @@ function normaliseMonth(parsed, fallbackMonth) {
   }
   record.transfers = numberOr(parsed.transfers, 0);
   record.moneyIn = numberOr(parsed.moneyIn, 0);
-  recomputeActuals(record);
   return record;
 }
 
 const byMonth = (a, b) => a.month.localeCompare(b.month);
 
 function normaliseState(parsed) {
-  const state = { ...normaliseMonth(parsed, getCurrentMonthStr()), pastMonths: [] };
+  const state = { ...makeEmptyState(getCurrentMonthStr()), ...normaliseMonth(parsed, getCurrentMonthStr()) };
   if (Array.isArray(parsed.pastMonths)) {
     state.pastMonths = parsed.pastMonths
       .filter((m) => m && typeof m === 'object' && typeof m.month === 'string')
       .map((m) => normaliseMonth(m, m.month))
       .sort(byMonth);
   }
+  const rates = parsed.rates || {};
+  Object.keys(state.rates).forEach((code) => {
+    state.rates[code] = numberOr(rates[code], 0) > 0 ? rates[code] : 0;
+  });
+  [state, ...state.pastMonths].forEach((record) => recomputeActuals(record, state.rates));
   return state;
 }
 
@@ -192,10 +226,11 @@ function checkAndResetMonth(state) {
   if (state.month === current) {
     return state;
   }
-  const { pastMonths, ...finished } = state;
+  const { pastMonths, rates, ...finished } = state;
   const newState = makeEmptyState(current);
   newState.carryOver = computeLeftover(state);
   newState.pastMonths = [...pastMonths.filter((m) => m.month !== finished.month), finished].sort(byMonth);
+  newState.rates = rates;
   saveState(newState);
   return newState;
 }
@@ -281,6 +316,44 @@ function renderExpenseCategoryOptions() {
   });
 }
 
+function renderExpenseCurrencyOptions() {
+  const select = document.getElementById('expense-currency');
+  select.innerHTML = '';
+  CURRENCIES.forEach((code) => {
+    const option = document.createElement('option');
+    option.value = code;
+    option.textContent = code;
+    select.appendChild(option);
+  });
+  select.value = BASE_CURRENCY;
+}
+
+function renderRates() {
+  Object.keys(state.rates).forEach((code) => {
+    document.getElementById(`rate-${code}`).value = numOrEmpty(state.rates[code]);
+  });
+}
+
+// Entries (and statement totals) in a currency without a rate count as 0, so
+// the user is told which rate is missing instead of the money quietly vanishing.
+function renderRateWarning() {
+  const missing = {};
+  allMonths().forEach((record) => {
+    record.entries.forEach((entry) => {
+      if (rateOf(entry.currency, state.rates) === 0) missing[entry.currency] = (missing[entry.currency] || 0) + 1;
+    });
+    if ((record.transfers > 0 || record.moneyIn > 0) && rateOf(STATEMENT_CURRENCY, state.rates) === 0) {
+      missing[STATEMENT_CURRENCY] = missing[STATEMENT_CURRENCY] || 0;
+    }
+  });
+  const codes = Object.keys(missing);
+  const parts = codes.map((code) => (missing[code] > 0 ? `${missing[code]} entries in ${code}` : `statement totals in ${code}`));
+  const warning = document.getElementById('rate-warning');
+  warning.hidden = codes.length === 0;
+  warning.textContent = codes.length === 0 ? ''
+    : `Not counted yet: ${parts.join(', ')}. Enter the ${codes.join(' and ')} rate under "Exchange rates".`;
+}
+
 function renderCategorySummary() {
   const container = document.getElementById('category-summary-list');
   container.innerHTML = '';
@@ -319,6 +392,14 @@ function renderCategorySummary() {
 
     container.appendChild(row);
   });
+}
+
+// "2640" for HUF; "2640 (24000 MNT)" for another currency; "? (24000 MNT)"
+// while that currency has no rate.
+function amountText(entry) {
+  if (entry.currency === BASE_CURRENCY) return formatAmount(entry.amount);
+  const huf = rateOf(entry.currency, state.rates) > 0 ? formatAmount(toHuf(entry.amount, entry.currency, state.rates)) : '?';
+  return `${huf} (${formatAmount(entry.amount)} ${entry.currency})`;
 }
 
 function appendSpan(parent, text, className) {
@@ -368,14 +449,14 @@ function renderHistory() {
     row.className = 'history-row';
     appendSpan(row, entry.time || '—', 'history-time');
     appendSpan(row, CATEGORY_LABELS[entry.category], 'history-category');
-    appendSpan(row, formatAmount(entry.amount), 'history-amount');
+    appendSpan(row, amountText(entry), 'history-amount');
     appendSpan(row, SOURCE_LABELS[entry.source], 'history-source');
     if (record === state) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'delete-btn';
       button.textContent = 'Delete';
-      button.setAttribute('aria-label', `Delete ${CATEGORY_LABELS[entry.category]} ${formatAmount(entry.amount)}`);
+      button.setAttribute('aria-label', `Delete ${CATEGORY_LABELS[entry.category]} ${amountText(entry)}`);
       button.addEventListener('click', () => deleteEntry(index));
       row.appendChild(button);
     }
@@ -422,13 +503,15 @@ function renderReport() {
   appendRow(table, ['Income', ...months.map((m) => formatAmount(m.income))]);
   appendRow(table, ['Must-pays', ...months.map((m) => formatAmount(sumMustPays(m)))]);
   if (months.some((m) => m.transfers > 0 || m.moneyIn > 0)) {
-    appendRow(table, ['Transfers out (statement, not counted)', ...months.map((m) => formatAmount(m.transfers))], 'report-aside');
-    appendRow(table, ['Money in (statement, not counted)', ...months.map((m) => formatAmount(m.moneyIn))], 'report-aside');
+    const huf = (amount) => formatAmount(toHuf(amount, STATEMENT_CURRENCY, state.rates));
+    appendRow(table, ['Transfers out (statement, not counted)', ...months.map((m) => huf(m.transfers))], 'report-aside');
+    appendRow(table, ['Money in (statement, not counted)', ...months.map((m) => huf(m.moneyIn))], 'report-aside');
   }
 }
 
 // Everything that shows spending: the summary, the history and the report.
 function renderSpending() {
+  renderRateWarning();
   renderCategorySummary();
   renderHistory();
   renderReport();
@@ -441,12 +524,14 @@ function renderAll() {
   renderLeftToPlan();
   renderCategoryPlanInputs();
   renderExpenseCategoryOptions();
+  renderExpenseCurrencyOptions();
+  renderRates();
   renderSpending();
 }
 
 function deleteEntry(index) {
   state.entries.splice(index, 1);
-  recomputeActuals(state);
+  recomputeActuals(state, state.rates);
   saveState(state);
   renderSpending();
 }
@@ -471,15 +556,32 @@ document.getElementById('add-expense-btn').addEventListener('click', () => {
   const category = document.getElementById('expense-category').value;
   const amountInput = document.getElementById('expense-amount');
   const amount = parseAmount(amountInput.value);
+  const currency = document.getElementById('expense-currency').value;
+  const message = document.getElementById('expense-message');
   if (amount <= 0) {
     return;
   }
-  state.entries.push({ time: getNowStr(), category, amount, source: 'typed' });
-  recomputeActuals(state);
+  if (rateOf(currency, state.rates) === 0) {
+    message.textContent = `Enter the ${currency} rate under "Exchange rates" first; the expense was not added.`;
+    return;
+  }
+  message.textContent = '';
+  state.entries.push({ time: getNowStr(), category, amount, currency, source: 'typed' });
+  recomputeActuals(state, state.rates);
   saveState(state);
   amountInput.value = '';
   historyMonth = state.month;
   renderSpending();
+});
+
+// A new rate re-converts every month's entries, as the user chose.
+Object.keys(state.rates).forEach((code) => {
+  document.getElementById(`rate-${code}`).addEventListener('input', (e) => {
+    state.rates[code] = parseRate(e.target.value);
+    allMonths().forEach((record) => recomputeActuals(record, state.rates));
+    saveState(state);
+    renderSpending();
+  });
 });
 
 document.getElementById('history-month').addEventListener('change', (e) => {
@@ -522,12 +624,14 @@ function importStatement(transactions) {
     } else if (tx.kind === 'transfer') {
       record.transfers = roundCents(record.transfers + tx.moneyOut);
     } else {
-      record.entries.push({ time: tx.time, category: tx.category, amount: tx.moneyOut, source: 'statement' });
+      record.entries.push({
+        time: tx.time, category: tx.category, amount: tx.moneyOut, currency: STATEMENT_CURRENCY, source: 'statement',
+      });
       if (record === state) addedNow += 1;
       else addedEarlier += 1;
     }
   });
-  allMonths().forEach(recomputeActuals);
+  allMonths().forEach((record) => recomputeActuals(record, state.rates));
   saveState(state);
   renderSpending();
 

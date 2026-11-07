@@ -16,12 +16,12 @@ Answered so far (details in PLANNING_LOG.md):
 Should the budget reset automatically every month? Yes, and the leftover is carried over to the next month.
 Should users be able to create their own expense categories? Not this term; seven fixed categories (the seventh, Unknown, holds imported purchases whose shop is not recognised).
 What is the simplest way to display spending so that it is easy to understand? Plan vs. actual with a progress bar per category.
-Should the application support multiple currencies? Not this term.
+Should the application support multiple currencies? Partly: the budget is in HUF, and expenses in MNT, EUR or USD are converted with rates the user types in.
 Should users be able to set savings goals? Not this term.
 
 ## The Size
 First version does:
-Enter monthly income (one currency)
+Enter monthly income (in HUF)
 Enter fixed must-pay expenses: rent, phone, transport
 Show what's left after must-pays
 Plan amounts for a fixed set of flexible categories (food, clothes, gym, subscriptions, going out, other, unknown)
@@ -31,10 +31,11 @@ Start a fresh month (automatically)
 Import a bank deposit statement (.xlsx); each purchase is saved in the history of its month, and this month's purchases and fees are added to the actual spending
 Keep a history of every expense (typed or imported) with date and time; a wrong entry can be deleted
 Keep every finished month and show one monthly report: actual / plan per category, income and must-pays
+Convert expenses in MNT, EUR or USD into HUF with exchange rates the user types; the bank statement's MNT amounts are converted too
 
 Explicitly not this term:
 
-Multiple currencies
+Income, must-pays and plans in other currencies; fetching exchange rates online
 Savings goals
 Custom categories
 Push notifications (a warning shown inside the app is enough for December; phone notifications are a whole project of their own)

@@ -2,7 +2,9 @@
 //
 // The statement is a made-up one built in memory (test-support/make-xlsx.js),
 // laid out like the real deposit statement: a title block, a header row,
-// one row per transaction and a total row at the end.
+// one row per transaction and a total row at the end. Its amounts are in MNT;
+// most tests set 1 MNT = 1 HUF so the numbers stay the statement's own
+// (conversion itself is tested in currency.test.js).
 
 const test = require('node:test');
 const assert = require('node:assert');
@@ -57,6 +59,7 @@ test('bank fees are known, so they go to Other, not Unknown', () => {
 
 test('import adds this month\'s purchases and fees to the budget, earlier ones to the history', async () => {
   const app = openApp({ today: '2026-11-15' });
+  app.setRate('MNT', '1');
   app.plan('food', '100');
   app.plan('clothes', '50');
   app.plan('other', '50');
@@ -82,6 +85,7 @@ test('import adds this month\'s purchases and fees to the budget, earlier ones t
 
 test('report per month: spending by category, transfers and money in kept apart', async () => {
   const app = openApp({ today: '2026-11-15' });
+  app.setRate('MNT', '1');
   await app.importFile(STATEMENT);
   const rows = app.reportRows();
   const row = (label) => rows.find((r) => r[0] === label);
@@ -99,6 +103,7 @@ test('report per month: spending by category, transfers and money in kept apart'
 
 test('importing the same statement twice does not count it twice', async () => {
   const app = openApp({ today: '2026-11-15' });
+  app.setRate('MNT', '1');
   await app.importFile(STATEMENT);
   await app.importFile(STATEMENT);
   const state = app.saved();
@@ -110,9 +115,10 @@ test('importing the same statement twice does not count it twice', async () => {
 
 test('a deleted statement purchase does not come back when the statement is imported again', async () => {
   const app = openApp({ today: '2026-11-15' });
+  app.setRate('MNT', '1');
   await app.importFile(STATEMENT);
   // Newest first: the top row is the 25 Decathlon purchase of 2026-11-04.
-  assert.deepStrictEqual(app.historyRows()[0], ['2026-11-04 10:00:00', 'Clothes', '25', 'statement', 'Delete']);
+  assert.deepStrictEqual(app.historyRows()[0], ['2026-11-04 10:00:00', 'Clothes', '25 (25 MNT)', 'statement', 'Delete']);
   app.deleteHistoryRow(0);
   await app.importFile(STATEMENT);
   assert.strictEqual(app.saved().categories.clothes.actual, 0);

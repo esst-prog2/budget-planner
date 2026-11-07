@@ -3,6 +3,9 @@
 // XML files, unpacked here with the browser's own DecompressionStream.
 // Loaded before app.js; the tests load it with require().
 
+// The deposit statement's amounts are in tögrög; the app converts them to HUF.
+const STATEMENT_CURRENCY = 'MNT';
+
 // Column headers of the deposit statement (Mongolian): date, money in,
 // money out, description.
 const STATEMENT_HEADERS = {
@@ -166,5 +169,7 @@ function transactionId(tx) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { readStatement, findTransactions, parseSheetRows, categoryFor, sortTransaction, transactionId };
+  module.exports = {
+    STATEMENT_CURRENCY, readStatement, findTransactions, parseSheetRows, categoryFor, sortTransaction, transactionId,
+  };
 }
