@@ -8,7 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { makeXlsx } = require('../test-support/make-xlsx');
 const { openApp } = require('../test-support/fake-browser');
-const { readStatement, buildReport, categoryFor, sortTransaction } = require('../statement');
+const { readStatement, categoryFor, sortTransaction } = require('../statement');
 
 const HEADER = ['Огноо', 'Теллер', 'Орлого', 'Зарлага', 'Ханш', 'Харьцсан данс', null, 'Үлдэгдэл', 'Гүйлгээний утга'];
 const tx = (time, moneyIn, moneyOut, description) => [time, '50', moneyIn, moneyOut, 1, null, null, 0, description];
@@ -55,25 +55,7 @@ test('bank fees are known, so they go to Other, not Unknown', () => {
   assert.deepStrictEqual(sortTransaction(fee), { kind: 'spending', category: 'other' });
 });
 
-test('report per month: spending by category, transfers and money in kept apart', async () => {
-  const report = buildReport(await readStatement(STATEMENT));
-  assert.deepStrictEqual(report.map((m) => m.month), ['2026-10', '2026-11']);
-  const [october, november] = report;
-  // October: food 120, unknown 45 -> 165; the 300 sent to a person is a transfer.
-  assert.deepStrictEqual(october.categories,
-    { food: 120, clothes: 0, gym: 0, subscriptions: 0, goingOut: 0, other: 0, unknown: 45 });
-  assert.strictEqual(october.spending, 165);
-  assert.strictEqual(october.transfers, 300);
-  assert.strictEqual(october.moneyIn, 1000);
-  // November: food 80 + 50.5 = 130.5, clothes 25, other 0.25 fee, unknown 30 -> 185.75.
-  assert.deepStrictEqual(november.categories,
-    { food: 130.5, clothes: 25, gym: 0, subscriptions: 0, goingOut: 0, other: 0.25, unknown: 30 });
-  assert.strictEqual(november.spending, 185.75);
-  assert.strictEqual(november.transfers, 0);
-  assert.strictEqual(november.moneyIn, 500);
-});
-
-test('import adds only this month\'s purchases and fees to the actual spending', async () => {
+test('import adds this month\'s purchases and fees to the budget, earlier ones to the history', async () => {
   const app = openApp({ today: '2026-11-15' });
   app.plan('food', '100');
   app.plan('clothes', '50');
@@ -88,31 +70,59 @@ test('import adds only this month\'s purchases and fees to the actual spending',
   assert.strictEqual(state.categories.clothes.actual, 25);
   assert.strictEqual(state.categories.other.actual, 0.25);
   assert.strictEqual(state.categories.unknown.actual, 30);
-  // October is in the report only, so nothing from it lands in November.
-  assert.strictEqual(state.categories.goingOut.actual, 0);
   assert.deepStrictEqual(app.warnings(), ['Food: 40.50 over plan']);
+  // October is kept as its own month: food 120, unknown 45; it does not touch November.
+  assert.deepStrictEqual(state.pastMonths.map((m) => m.month), ['2026-10']);
+  assert.strictEqual(state.pastMonths[0].categories.food.actual, 120);
+  assert.strictEqual(state.pastMonths[0].categories.unknown.actual, 45);
+  assert.strictEqual(state.carryOver, 0);
   assert.strictEqual(app.shown('statement-status'),
-    'Read 10 transactions (2026-10 to 2026-11). Added 5 purchases from 2026-11 to this month\'s actual spending.');
+    'Read 10 transactions (2026-10 to 2026-11). Added 5 purchases to this month and 2 to earlier months in the history.');
+});
+
+test('report per month: spending by category, transfers and money in kept apart', async () => {
+  const app = openApp({ today: '2026-11-15' });
+  await app.importFile(STATEMENT);
+  const rows = app.reportRows();
+  const row = (label) => rows.find((r) => r[0] === label);
+  assert.deepStrictEqual(rows[0], ['', '2026-10', '2026-11']);
+  // October: food 120, unknown 45 -> 165; the 300 sent to a person is a transfer.
+  // November: food 80 + 50.5 = 130.5, clothes 25, other 0.25 fee, unknown 30 -> 185.75.
+  assert.deepStrictEqual(row('Food'), ['Food', '120', '130.50']);
+  assert.deepStrictEqual(row('Clothes'), ['Clothes', '0', '25']);
+  assert.deepStrictEqual(row('Other'), ['Other', '0', '0.25']);
+  assert.deepStrictEqual(row('Unknown'), ['Unknown', '45', '30']);
+  assert.deepStrictEqual(row('Spending'), ['Spending', '165', '185.75']);
+  assert.deepStrictEqual(row('Transfers out (statement, not counted)'), ['Transfers out (statement, not counted)', '300', '0']);
+  assert.deepStrictEqual(row('Money in (statement, not counted)'), ['Money in (statement, not counted)', '1000', '500']);
 });
 
 test('importing the same statement twice does not count it twice', async () => {
   const app = openApp({ today: '2026-11-15' });
   await app.importFile(STATEMENT);
   await app.importFile(STATEMENT);
-  assert.strictEqual(app.saved().categories.food.actual, 130.5);
-  assert.match(app.shown('statement-status'), /Nothing new from 2026-11/);
+  const state = app.saved();
+  assert.strictEqual(state.categories.food.actual, 130.5);
+  assert.strictEqual(state.pastMonths[0].categories.food.actual, 120);
+  assert.strictEqual(state.pastMonths[0].transfers, 300);
+  assert.match(app.shown('statement-status'), /Nothing new/);
 });
 
-test('the report table shows one column per month and is saved for the next visit', async () => {
+test('a deleted statement purchase does not come back when the statement is imported again', async () => {
   const app = openApp({ today: '2026-11-15' });
   await app.importFile(STATEMENT);
-  const rows = app.reportRows();
-  assert.deepStrictEqual(rows[0], ['', '2026-10', '2026-11']);
-  assert.deepStrictEqual(rows[1], ['Food', '120', '130.50']);
-  assert.deepStrictEqual(rows.find((r) => r[0] === 'Spending'), ['Spending', '165', '185.75']);
-  assert.deepStrictEqual(rows.find((r) => r[0].startsWith('Transfers')), ['Transfers out (not counted)', '300', '0']);
-  const saved = JSON.parse(app.storedAll()['budgetPlanner:v1:report']);
-  assert.strictEqual(saved.length, 2);
+  // Newest first: the top row is the 25 Decathlon purchase of 2026-11-04.
+  assert.deepStrictEqual(app.historyRows()[0], ['2026-11-04 10:00:00', 'Clothes', '25', 'statement', 'Delete']);
+  app.deleteHistoryRow(0);
+  await app.importFile(STATEMENT);
+  assert.strictEqual(app.saved().categories.clothes.actual, 0);
+});
+
+test('the report is kept for the next visit', async () => {
+  const app = openApp({ today: '2026-11-15' });
+  await app.importFile(STATEMENT);
+  const again = openApp({ today: '2026-11-15', saved: app.saved() });
+  assert.deepStrictEqual(again.reportRows(), app.reportRows());
 });
 
 test('a file that is not a statement changes nothing and says so', async () => {
@@ -121,5 +131,5 @@ test('a file that is not a statement changes nothing and says so', async () => {
   await app.importFile(Buffer.from('not a spreadsheet'));
   assert.strictEqual(app.saved().categories.food.actual, 10);
   assert.match(app.shown('statement-status'), /could not be read/);
-  assert.deepStrictEqual(app.reportRows(), []);
+  assert.deepStrictEqual(app.reportRows()[0], ['', '2026-11']);
 });

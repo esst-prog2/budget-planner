@@ -1,5 +1,5 @@
 // Reads a bank statement (.xlsx) in the browser and sorts its transactions
-// into the planner's six categories. No libraries: an .xlsx file is a zip of
+// into the planner's categories. No libraries: an .xlsx file is a zip of
 // XML files, unpacked here with the browser's own DecompressionStream.
 // Loaded before app.js; the tests load it with require().
 
@@ -27,7 +27,6 @@ const CATEGORY_KEYWORDS = {
   subscriptions: ['NETFLIX', 'SPOTIFY', 'YOUTUBE', 'APPLE.COM', 'GOOGLE'],
   goingOut: ['BURGER KING', 'PIZZ', 'MCDONALD', 'KFC', 'CINEMA', "SZE'CHENYI", 'STEAMGAMES'],
 };
-const REPORT_CATEGORIES = [...Object.keys(CATEGORY_KEYWORDS), 'other', 'unknown'];
 
 function categoryFor(description) {
   const text = description.toUpperCase();
@@ -159,44 +158,13 @@ async function readStatement(buffer) {
   return findTransactions(parseSheetRows(files[sheet], shared));
 }
 
-// --- The report ---
-
 // Same time and amount means the same transaction, so importing a statement
-// twice does not count it twice.
+// twice does not save it twice. Money in is marked with "+" so it cannot clash
+// with a payment of the same amount in the same second.
 function transactionId(tx) {
-  return `${tx.time}|${tx.moneyOut}`;
-}
-
-// Totals per month: spending per category, plus transfers and money in,
-// which are shown but not counted as spending.
-function buildReport(transactions) {
-  const months = {};
-  transactions.forEach((tx) => {
-    if (!months[tx.month]) {
-      months[tx.month] = {
-        month: tx.month,
-        categories: Object.fromEntries(REPORT_CATEGORIES.map((c) => [c, 0])),
-        spending: 0,
-        transfers: 0,
-        moneyIn: 0,
-      };
-    }
-    const m = months[tx.month];
-    if (tx.kind === 'in') m.moneyIn += tx.moneyIn;
-    else if (tx.kind === 'transfer') m.transfers += tx.moneyOut;
-    else {
-      m.categories[tx.category] += tx.moneyOut;
-      m.spending += tx.moneyOut;
-    }
-  });
-  const round = (value) => Math.round(value * 100) / 100;
-  return Object.keys(months).sort().map((key) => {
-    const m = months[key];
-    REPORT_CATEGORIES.forEach((c) => { m.categories[c] = round(m.categories[c]); });
-    return { ...m, spending: round(m.spending), transfers: round(m.transfers), moneyIn: round(m.moneyIn) };
-  });
+  return tx.moneyIn > 0 ? `${tx.time}|+${tx.moneyIn}` : `${tx.time}|${tx.moneyOut}`;
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { readStatement, findTransactions, parseSheetRows, categoryFor, sortTransaction, buildReport, transactionId };
+  module.exports = { readStatement, findTransactions, parseSheetRows, categoryFor, sortTransaction, transactionId };
 }
