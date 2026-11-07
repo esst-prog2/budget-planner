@@ -43,6 +43,10 @@ The system SHALL show, for each month in the statement, the spending per categor
 ### Requirement: This month's spending feeds the planner once
 The system SHALL add the spending of the planner's current month to each category's actual amount, and SHALL NOT add the same transaction again when a statement is imported twice.
 
+#### Scenario: Two identical fees in the same second
+- **WHEN** the statement has two 100 fees at the same time
+- **THEN** both are counted, 200 in total, and importing the statement again adds nothing
+
 #### Scenario: Importing the same statement twice
 - **WHEN** a statement with 130.5 of November food spending is imported twice in November
 - **THEN** food's actual amount goes up by 130.5 only once

@@ -614,15 +614,17 @@ function importStatement(transactions) {
   }
   let addedNow = 0;
   let addedEarlier = 0;
+  let addedAside = 0;
   transactions.forEach((tx) => {
     const record = monthRecord(tx.month);
-    const id = transactionId(tx);
-    if (record.importedIds.includes(id)) return;
-    record.importedIds.push(id);
+    if (record.importedIds.includes(tx.id)) return;
+    record.importedIds.push(tx.id);
     if (tx.kind === 'in') {
       record.moneyIn = roundCents(record.moneyIn + tx.moneyIn);
+      addedAside += 1;
     } else if (tx.kind === 'transfer') {
       record.transfers = roundCents(record.transfers + tx.moneyOut);
+      addedAside += 1;
     } else {
       record.entries.push({
         time: tx.time, category: tx.category, amount: tx.moneyOut, currency: STATEMENT_CURRENCY, source: 'statement',
@@ -636,10 +638,13 @@ function importStatement(transactions) {
   renderSpending();
 
   const months = [...new Set(transactions.map((tx) => tx.month))].sort();
-  const read = `Read ${transactions.length} transactions (${months[0]} to ${months[months.length - 1]}).`;
-  status.textContent = addedNow + addedEarlier > 0
-    ? `${read} Added ${addedNow} purchases to this month and ${addedEarlier} to earlier months in the history.`
-    : `${read} Nothing new: this statement was already imported.`;
+  const parts = [`Read ${transactions.length} transactions (${months[0]} to ${months[months.length - 1]}).`];
+  if (addedNow + addedEarlier > 0) {
+    parts.push(`Added ${addedNow} purchases to this month and ${addedEarlier} to earlier months in the history.`);
+  }
+  if (addedAside > 0) parts.push(`Added ${addedAside} transfers or money in to the report.`);
+  if (parts.length === 1) parts.push('Nothing new: this statement was already imported.');
+  status.textContent = parts.join(' ');
 }
 
 document.getElementById('statement-input').addEventListener('change', (e) => {
