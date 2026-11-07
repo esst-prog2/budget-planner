@@ -1,7 +1,7 @@
 # budget-planner
 ## What is this project?
 Helps to manage student's budget and expenses
-They can insert the incomes and the app shows must pay expenses(rent, phone, transport) first, then the user plans the additional expenses (food, clothes, gym, subscriptions, going out, other). Importantly, whenever the actual expense exceeds the plan, the app shows a warning inside the app.
+They can insert the incomes and the app shows must pay expenses(rent, phone, transport) first, then the user plans the additional expenses (food, clothes, gym, subscriptions, going out, other, unknown). Importantly, whenever the actual expense exceeds the plan, the app shows a warning inside the app.
 
 ## Who is it for?
 Whoever wants to track their expenses, but mostly aiming for the international students across world.
@@ -14,7 +14,7 @@ Sometimes I forgot important events that I need to expense little bit lot. If I 
 Answered so far (details in PLANNING_LOG.md):
 
 Should the budget reset automatically every month? Yes, and the leftover is carried over to the next month.
-Should users be able to create their own expense categories? Not this term; six fixed categories.
+Should users be able to create their own expense categories? Not this term; seven fixed categories (the seventh, Unknown, holds imported purchases whose shop is not recognised).
 What is the simplest way to display spending so that it is easy to understand? Plan vs. actual with a progress bar per category.
 Should the application support multiple currencies? Not this term.
 Should users be able to set savings goals? Not this term.
@@ -24,7 +24,7 @@ First version does:
 Enter monthly income (one currency)
 Enter fixed must-pay expenses: rent, phone, transport
 Show what's left after must-pays
-Plan amounts for a fixed set of flexible categories (food, clothes, gym, subscriptions, going out, other)
+Plan amounts for a fixed set of flexible categories (food, clothes, gym, subscriptions, going out, other, unknown)
 Record actual expenses against a category
 Show a warning when a category's actual spending passes its plan
 Start a fresh month (automatically)
@@ -54,6 +54,6 @@ I open the app and enter this month's income: 1,200. I add rent 650, phone 20, t
 ## Run it
 Open `index.html` in a browser; there is no build step and no server. Data stays in the browser's localStorage.
 
-To import a statement, pick the .xlsx file under "Bank statement report". It is read in the browser only. Shops are sorted by name (the list is `CATEGORY_KEYWORDS` in `statement.js`); purchases without a shop name go to Other. Keep real statements out of Git: `*.xlsx` is ignored.
+To import a statement, pick the .xlsx file under "Bank statement report". It is read in the browser only. Shops are sorted by name (the list is `CATEGORY_KEYWORDS` in `statement.js`); purchases whose shop is not recognised go to Unknown, bank fees to Other. Keep real statements out of Git: `*.xlsx` is ignored.
 
 Tests (Node.js 18 or newer, no dependencies): `node --test`

@@ -6,7 +6,7 @@ Typing every expense by hand is the step that gets skipped. The bank already lis
 
 - Add a statement file picker to the page. The .xlsx file is read in the browser only (no server, nothing uploaded, no libraries).
 - Sort each transaction: money in, transfers to people or own accounts, and spending (purchases, QPay/Happy Pay payments, bank fees). Only spending counts.
-- Put spending into the six categories by shop-name keywords; anything not matched goes to "other".
+- Put spending into the categories by shop-name keywords; bank fees go to "other", and a purchase whose shop is not recognised goes to a new seventh category, "unknown".
 - Show a report with one column per month: spending per category and in total, plus transfers out and money in, listed but not counted.
 - Add this month's spending to the planner's actual amounts, once per transaction, even if the same statement is imported again. Earlier months are only shown in the report.
 - **Explicitly excluded:** choosing a category per transaction by hand, currency conversion (the statement is treated as the budget's currency), statement formats of other banks.

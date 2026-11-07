@@ -15,8 +15,11 @@ const STATEMENT_HEADERS = {
 // Money sent to people or to your own accounts: listed, but not spending.
 const TRANSFER_PATTERN = /илгээв|шилжүүлэв|Transfer/iu;
 
-// Shop names, matched at the start of a word. Anything else is "other",
-// including bank fees and purchases that only say "POS Normal Purchase".
+// Bank fees and charges: spending, always in "other".
+const FEE_PATTERN = /шимтгэл|Charge - Capitalise/iu;
+
+// Shop names, matched at the start of a word. A purchase with no known shop,
+// such as one that only says "POS Normal Purchase", is "unknown".
 const CATEGORY_KEYWORDS = {
   food: ['CBA', 'SPAR', 'LIDL', 'ALDI', 'TESCO', 'PENNY', 'AUCHAN', 'MANNA ABC', 'ELELMISZER', 'COCACOLA', 'BELLO', 'BUFE'],
   clothes: ['DECATHLON', 'H&M', 'ZARA', 'PRIMARK', 'UNIQLO', 'PEPCO', 'DEICHMANN'],
@@ -24,7 +27,7 @@ const CATEGORY_KEYWORDS = {
   subscriptions: ['NETFLIX', 'SPOTIFY', 'YOUTUBE', 'APPLE.COM', 'GOOGLE'],
   goingOut: ['BURGER KING', 'PIZZ', 'MCDONALD', 'KFC', 'CINEMA', "SZE'CHENYI", 'STEAMGAMES'],
 };
-const REPORT_CATEGORIES = [...Object.keys(CATEGORY_KEYWORDS), 'other'];
+const REPORT_CATEGORIES = [...Object.keys(CATEGORY_KEYWORDS), 'other', 'unknown'];
 
 function categoryFor(description) {
   const text = description.toUpperCase();
@@ -35,12 +38,13 @@ function categoryFor(description) {
       // one, e.g. GYM in LA'GYMA'NYOS.
       return at !== -1 && (at === 0 || !/[A-Z']/.test(text[at - 1]));
     }));
-  return found || 'other';
+  return found || 'unknown';
 }
 
 function sortTransaction(tx) {
   if (tx.moneyIn > 0) return { kind: 'in' };
   if (TRANSFER_PATTERN.test(tx.description)) return { kind: 'transfer' };
+  if (FEE_PATTERN.test(tx.description)) return { kind: 'spending', category: 'other' };
   return { kind: 'spending', category: categoryFor(tx.description) };
 }
 
