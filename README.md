@@ -52,7 +52,7 @@ No category: the user puts it in "Other" (custom categories are not built this t
 Income entered twice: 1,200 entered twice on the same day. The app ask if it is correct or not? (backlog, not built yet)
 
 ## Demo
-I open the app and enter this month's income: 1,200. I add rent 650, phone 20, transport 49. The screen shows 481 left. I plan food 200 and going out 50. Then I record a 25 grocery purchase that pushes food past its plan, and a red warning appears: Food: 15 over plan.
+I open `index.html` and type my October numbers: income 300,000 HUF and my rent, phone and transport, 130,000 together, and the screen shows 170000 left to plan. I plan food at 80,000, record a 90,000 grocery shop, and a red warning appears: "Food: 10000 over plan". Under "Exchange rates" I type today's MNT rate and import my bank statement, `customer-deposit-statement-excel.xlsx`: the app reads 215 transactions, and the Monthly report fills with one column per month from August, tögrög converted to forints and sorted into Food, Going out and Unknown. In History, among the imported purchases, I find the 90,000 shop I typed by hand, delete it, and the Food warning disappears and the report updates at once.
 
 ## Run it
 Open `index.html` in a browser; there is no build step and no server. Data stays in the browser's localStorage.
