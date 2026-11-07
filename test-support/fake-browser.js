@@ -68,10 +68,18 @@ function openApp({ today, saved } = {}) {
       input.value = value;
       input.handlers.input();
     },
-    addExpense(category, amount) {
+    // currency is left as the app set it (HUF) unless given.
+    addExpense(category, amount, currency) {
       byId('expense-category').value = category;
       byId('expense-amount').value = String(amount);
+      if (currency) byId('expense-currency').value = currency;
       byId('add-expense-btn').handlers.click();
+    },
+    // Types `value` as the HUF rate for one unit of `code` (MNT, EUR or USD).
+    setRate(code, value) {
+      const input = byId(`rate-${code}`);
+      input.value = value;
+      input.handlers.input({ target: input });
     },
     // Picks `bytes` in the statement file input; resolves once it is imported.
     importFile: (bytes) => byId('statement-input').handlers.change({

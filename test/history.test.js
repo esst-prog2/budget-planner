@@ -18,8 +18,8 @@ test('a typed expense is saved with its time, category, amount and source, newes
     ['2026-11-15 12:00:00', 'Food', '25', 'typed', 'Delete'],
   ]);
   assert.deepStrictEqual(app.saved().entries, [
-    { time: '2026-11-15 12:00:00', category: 'food', amount: 25, source: 'typed' },
-    { time: '2026-11-15 12:00:00', category: 'goingOut', amount: 12.5, source: 'typed' },
+    { time: '2026-11-15 12:00:00', category: 'food', amount: 25, currency: 'HUF', source: 'typed' },
+    { time: '2026-11-15 12:00:00', category: 'goingOut', amount: 12.5, currency: 'HUF', source: 'typed' },
   ]);
 });
 
@@ -100,7 +100,7 @@ test('an old month saved before the history existed keeps its totals after the m
   } });
   const october = app.saved().pastMonths[0];
   assert.strictEqual(october.categories.food.actual, 300);
-  assert.deepStrictEqual(october.entries, [{ time: null, category: 'food', amount: 300, source: 'earlier' }]);
+  assert.deepStrictEqual(october.entries, [{ time: null, category: 'food', amount: 300, currency: 'HUF', source: 'earlier' }]);
   assert.strictEqual(app.saved().carryOver, 181);
 });
 

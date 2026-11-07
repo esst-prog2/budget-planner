@@ -43,6 +43,24 @@
       <div id="category-plan-list"></div>
     </section>
 
+    <section id="rates-section">
+      <h2>Exchange rates</h2>
+      <p class="hint">The budget is in HUF. Expenses in another currency are converted with these rates;
+        changing a rate updates every month.</p>
+      <label class="field">
+        1 MNT = HUF
+        <input type="number" id="rate-MNT" min="0" step="any" placeholder="e.g. 0.11">
+      </label>
+      <label class="field">
+        1 EUR = HUF
+        <input type="number" id="rate-EUR" min="0" step="any" placeholder="e.g. 400">
+      </label>
+      <label class="field">
+        1 USD = HUF
+        <input type="number" id="rate-USD" min="0" step="any" placeholder="e.g. 360">
+      </label>
+    </section>
+
     <section id="expense-section">
       <h2>Record an expense</h2>
       <label class="field">
@@ -53,11 +71,17 @@
         Amount
         <input type="number" id="expense-amount" min="0" step="0.01" placeholder="0">
       </label>
+      <label class="field">
+        Currency
+        <select id="expense-currency"></select>
+      </label>
       <button id="add-expense-btn" type="button">Add expense</button>
+      <p id="expense-message" class="warning"></p>
     </section>
 
     <section id="summary-section">
       <h2>Spending summary</h2>
+      <p id="rate-warning" class="warning" hidden></p>
       <div id="category-summary-list"></div>
     </section>
 
