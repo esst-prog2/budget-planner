@@ -8,7 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { makeXlsx } = require('../test-support/make-xlsx');
 const { openApp } = require('../test-support/fake-browser');
-const { readStatement, buildReport, categoryFor } = require('../statement');
+const { readStatement, buildReport, categoryFor, sortTransaction } = require('../statement');
 
 const HEADER = ['Огноо', 'Теллер', 'Орлого', 'Зарлага', 'Ханш', 'Харьцсан данс', null, 'Үлдэгдэл', 'Гүйлгээний утга'];
 const tx = (time, moneyIn, moneyOut, description) => [time, '50', moneyIn, moneyOut, 1, null, null, 0, description];
@@ -40,27 +40,34 @@ test('reads every dated row of the statement and skips the title and total rows'
   assert.strictEqual(sum('moneyOut'), 650.75);
 });
 
-test('shop names pick the category; everything unknown is Other', () => {
+test('shop names pick the category; a shop that is not recognised is Unknown', () => {
   assert.strictEqual(categoryFor('CB - POS Purchase CBA GO:RO:G CSEMEGE.BUDAPEST'), 'food');
   assert.strictEqual(categoryFor('P10 - Purchase CBAPRIMACORVIN - CBA PRI\'MA CORVIN'), 'food');
   assert.strictEqual(categoryFor('P10 - Purchase 3 - DECATHLON NYUGATI TE\'R'), 'clothes');
   assert.strictEqual(categoryFor('BURGER KING EMKE / BUDAPEST'), 'goingOut');
   // GYM inside LA'GYMA'NYOS is not a gym.
-  assert.strictEqual(categoryFor("LA'GYMA'NYOS CAMPUS / BUDAPEST"), 'other');
-  assert.strictEqual(categoryFor('13148888:POS Normal Purchase'), 'other');
+  assert.strictEqual(categoryFor("LA'GYMA'NYOS CAMPUS / BUDAPEST"), 'unknown');
+  assert.strictEqual(categoryFor('13148888:POS Normal Purchase'), 'unknown');
+});
+
+test('bank fees are known, so they go to Other, not Unknown', () => {
+  const fee = { moneyIn: 0, moneyOut: 100, description: 'EB -И-БАНК ГҮЙЛГЭЭНИЙ ШИМТГЭЛ' };
+  assert.deepStrictEqual(sortTransaction(fee), { kind: 'spending', category: 'other' });
 });
 
 test('report per month: spending by category, transfers and money in kept apart', async () => {
   const report = buildReport(await readStatement(STATEMENT));
   assert.deepStrictEqual(report.map((m) => m.month), ['2026-10', '2026-11']);
   const [october, november] = report;
-  // October: food 120, other 45 -> 165; the 300 sent to a person is a transfer.
-  assert.deepStrictEqual(october.categories, { food: 120, clothes: 0, gym: 0, subscriptions: 0, goingOut: 0, other: 45 });
+  // October: food 120, unknown 45 -> 165; the 300 sent to a person is a transfer.
+  assert.deepStrictEqual(october.categories,
+    { food: 120, clothes: 0, gym: 0, subscriptions: 0, goingOut: 0, other: 0, unknown: 45 });
   assert.strictEqual(october.spending, 165);
   assert.strictEqual(october.transfers, 300);
   assert.strictEqual(october.moneyIn, 1000);
-  // November: food 80 + 50.5 = 130.5, clothes 25, other 30 + 0.25 fee = 30.25 -> 185.75.
-  assert.deepStrictEqual(november.categories, { food: 130.5, clothes: 25, gym: 0, subscriptions: 0, goingOut: 0, other: 30.25 });
+  // November: food 80 + 50.5 = 130.5, clothes 25, other 0.25 fee, unknown 30 -> 185.75.
+  assert.deepStrictEqual(november.categories,
+    { food: 130.5, clothes: 25, gym: 0, subscriptions: 0, goingOut: 0, other: 0.25, unknown: 30 });
   assert.strictEqual(november.spending, 185.75);
   assert.strictEqual(november.transfers, 0);
   assert.strictEqual(november.moneyIn, 500);
@@ -71,6 +78,7 @@ test('import adds only this month\'s purchases and fees to the actual spending',
   app.plan('food', '100');
   app.plan('clothes', '50');
   app.plan('other', '50');
+  app.plan('unknown', '50');
   app.addExpense('food', 10);
   await app.importFile(STATEMENT);
 
@@ -78,7 +86,8 @@ test('import adds only this month\'s purchases and fees to the actual spending',
   // 10 typed by hand + 130.5 from the statement.
   assert.strictEqual(state.categories.food.actual, 140.5);
   assert.strictEqual(state.categories.clothes.actual, 25);
-  assert.strictEqual(state.categories.other.actual, 30.25);
+  assert.strictEqual(state.categories.other.actual, 0.25);
+  assert.strictEqual(state.categories.unknown.actual, 30);
   // October is in the report only, so nothing from it lands in November.
   assert.strictEqual(state.categories.goingOut.actual, 0);
   assert.deepStrictEqual(app.warnings(), ['Food: 40.50 over plan']);

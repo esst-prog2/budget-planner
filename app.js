@@ -4,7 +4,7 @@ const BACKUP_KEY = 'budgetPlanner:v1:unreadable';
 // Monthly totals from the last imported bank statement (no single transactions).
 const REPORT_KEY = 'budgetPlanner:v1:report';
 
-const CATEGORY_ORDER = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other'];
+const CATEGORY_ORDER = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other', 'unknown'];
 const CATEGORY_LABELS = {
   food: 'Food',
   clothes: 'Clothes',
@@ -12,6 +12,7 @@ const CATEGORY_LABELS = {
   subscriptions: 'Subscriptions',
   goingOut: 'Going out',
   other: 'Other',
+  unknown: 'Unknown',
 };
 
 function getCurrentMonthStr() {

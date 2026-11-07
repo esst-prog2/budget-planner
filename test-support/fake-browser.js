@@ -9,7 +9,7 @@ const APP_SOURCE = ['statement.js', 'app.js']
   .map((file) => fs.readFileSync(path.join(__dirname, '..', file), 'utf8'))
   .join('\n');
 const STORAGE_KEY = 'budgetPlanner:v1';
-const CATEGORY_KEYS = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other'];
+const CATEGORY_KEYS = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other', 'unknown'];
 
 function fakeElement(register) {
   return {
