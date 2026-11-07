@@ -61,18 +61,32 @@
       <div id="category-summary-list"></div>
     </section>
 
+    <section id="history-section">
+      <h2>History</h2>
+      <label class="field">
+        Month
+        <select id="history-month"></select>
+      </label>
+      <div id="history-list"></div>
+    </section>
+
+    <section id="report-section">
+      <h2>Monthly report</h2>
+      <p class="hint">Actual spending / plan for every saved month, typed and imported. Red is over a plan you set.</p>
+      <div class="report-scroll">
+        <table id="monthly-report"></table>
+      </div>
+    </section>
+
     <section id="statement-section">
-      <h2>Bank statement report</h2>
+      <h2>Import a bank statement</h2>
       <p class="hint">Pick your deposit statement (.xlsx). It is read in this browser only; nothing is uploaded.
-        Purchases and fees from this month are added to the actual spending above.</p>
+        Each purchase is saved in the history of its month; only this month's change the budget above.</p>
       <label class="field">
         Statement
         <input type="file" id="statement-input" accept=".xlsx">
       </label>
       <p id="statement-status" class="hint"></p>
-      <div class="report-scroll">
-        <table id="statement-report"></table>
-      </div>
     </section>
   </div>
 

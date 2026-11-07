@@ -143,32 +143,75 @@ h2 {
   overflow-x: auto;
 }
 
-#statement-report {
+#monthly-report {
   border-collapse: collapse;
   width: 100%;
   font-size: 0.9rem;
 }
 
-#statement-report th,
-#statement-report td {
+#monthly-report th,
+#monthly-report td {
   padding: 4px 8px;
   border-bottom: 1px solid var(--border);
   text-align: right;
   white-space: nowrap;
 }
 
-#statement-report th {
+#monthly-report th {
   text-align: left;
   font-weight: normal;
 }
 
-#statement-report .report-head td,
-#statement-report .report-total {
+#monthly-report .report-head td,
+#monthly-report .report-total {
   font-weight: 600;
 }
 
-#statement-report .report-aside {
+#monthly-report .report-aside {
   color: var(--muted);
+}
+
+#monthly-report td.over {
+  color: var(--over);
+  font-weight: 600;
+}
+
+.history-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.history-time {
+  color: var(--muted);
+  min-width: 140px;
+}
+
+.history-category {
+  flex: 1;
+}
+
+.history-amount {
+  font-weight: 600;
+}
+
+.history-source {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.delete-btn {
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: none;
+  color: var(--over);
+  border: 1px solid var(--over);
+  border-radius: 4px;
 }
 
 @media (prefers-color-scheme: dark) {

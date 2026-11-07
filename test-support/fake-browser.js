@@ -77,9 +77,26 @@ function openApp({ today, saved } = {}) {
     importFile: (bytes) => byId('statement-input').handlers.change({
       target: { files: [{ arrayBuffer: async () => bytes }] },
     }),
-    // The statement report table as rows of cell texts.
-    reportRows: () => byId('statement-report').children
+    // The monthly report table as rows of cell texts.
+    reportRows: () => byId('monthly-report').children
       .map((row) => row.children.map((cell) => cell.textContent)),
+    // The class of each report cell, e.g. 'over' for a red one.
+    reportClasses: () => byId('monthly-report').children
+      .map((row) => row.children.map((cell) => cell.className)),
+    // Picks a month in the history.
+    showHistoryMonth: (month) => byId('history-month').handlers.change({ target: { value: month } }),
+    // The history rows as [time, category, amount, source(, 'Delete')].
+    historyRows: () => byId('history-list').children
+      .filter((child) => child.className === 'history-row')
+      .map((row) => row.children.map((cell) => cell.textContent)),
+    historyNotes: () => byId('history-list').children
+      .filter((child) => child.className === 'hint')
+      .map((child) => child.textContent),
+    // Clicks Delete on the history row at `index` (0 is the top row).
+    deleteHistoryRow(index) {
+      const row = byId('history-list').children.filter((child) => child.className === 'history-row')[index];
+      row.children.find((child) => child.className === 'delete-btn').handlers.click();
+    },
     // The texts of the red over-plan warnings currently on the screen.
     warnings: () => byId('category-summary-list').children
       .flatMap((row) => row.children)
