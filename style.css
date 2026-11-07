@@ -125,6 +125,52 @@ h2 {
   margin-top: 4px;
 }
 
+.hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.field input[type="file"] {
+  width: auto;
+  max-width: 60%;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+/* The report has one column per month, so it scrolls sideways on a phone
+   instead of widening the page. */
+.report-scroll {
+  overflow-x: auto;
+}
+
+#statement-report {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+#statement-report th,
+#statement-report td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  white-space: nowrap;
+}
+
+#statement-report th {
+  text-align: left;
+  font-weight: normal;
+}
+
+#statement-report .report-head td,
+#statement-report .report-total {
+  font-weight: 600;
+}
+
+#statement-report .report-aside {
+  color: var(--muted);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1b1d1c;

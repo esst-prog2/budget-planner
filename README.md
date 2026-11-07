@@ -28,6 +28,7 @@ Plan amounts for a fixed set of flexible categories (food, clothes, gym, subscri
 Record actual expenses against a category
 Show a warning when a category's actual spending passes its plan
 Start a fresh month (automatically)
+Import a bank deposit statement (.xlsx) for a categorized report per month; this month's purchases and fees are added to the actual spending
 
 Explicitly not this term:
 
@@ -52,5 +53,7 @@ I open the app and enter this month's income: 1,200. I add rent 650, phone 20, t
 
 ## Run it
 Open `index.html` in a browser; there is no build step and no server. Data stays in the browser's localStorage.
+
+To import a statement, pick the .xlsx file under "Bank statement report". It is read in the browser only. Shops are sorted by name (the list is `CATEGORY_KEYWORDS` in `statement.js`); purchases without a shop name go to Other. Keep real statements out of Git: `*.xlsx` is ignored.
 
 Tests (Node.js 18 or newer, no dependencies): `node --test`

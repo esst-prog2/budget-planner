@@ -1,6 +1,8 @@
 const STORAGE_KEY = 'budgetPlanner:v1';
 // Saved text that could not be read is moved here instead of being overwritten.
 const BACKUP_KEY = 'budgetPlanner:v1:unreadable';
+// Monthly totals from the last imported bank statement (no single transactions).
+const REPORT_KEY = 'budgetPlanner:v1:report';
 
 const CATEGORY_ORDER = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other'];
 const CATEGORY_LABELS = {
@@ -32,6 +34,8 @@ function makeEmptyState(month) {
     income: 0,
     mustPays: { rent: 0, phone: 0, transport: 0 },
     categories: makeEmptyCategories(),
+    // Statement transactions already added to this month's actual spending.
+    importedIds: [],
   };
 }
 
@@ -70,6 +74,9 @@ function normaliseState(parsed) {
     const saved = categories[key] || {};
     state.categories[key] = { plan: numberOr(saved.plan, 0), actual: numberOr(saved.actual, 0) };
   });
+  if (Array.isArray(parsed.importedIds)) {
+    state.importedIds = parsed.importedIds.filter((id) => typeof id === 'string');
+  }
   return state;
 }
 
@@ -98,6 +105,17 @@ function loadState() {
 
 function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// The report can always be made again by importing the statement, so an
+// unreadable one is simply not shown.
+function loadReport() {
+  try {
+    const report = JSON.parse(localStorage.getItem(REPORT_KEY));
+    return Array.isArray(report) ? report : [];
+  } catch (err) {
+    return [];
+  }
 }
 
 function sumMustPays(state) {
@@ -235,6 +253,32 @@ function renderCategorySummary() {
   });
 }
 
+function appendRow(table, cells, className) {
+  const row = document.createElement('tr');
+  if (className) row.className = className;
+  cells.forEach((text, i) => {
+    const cell = document.createElement(i === 0 ? 'th' : 'td');
+    cell.textContent = text;
+    row.appendChild(cell);
+  });
+  table.appendChild(row);
+}
+
+// One column per month: spending per category, then transfers and money in,
+// which are listed but not counted as spending.
+function renderReport(report) {
+  const table = document.getElementById('statement-report');
+  table.innerHTML = '';
+  if (report.length === 0) return;
+  appendRow(table, ['', ...report.map((m) => m.month)], 'report-head');
+  CATEGORY_ORDER.forEach((key) => {
+    appendRow(table, [CATEGORY_LABELS[key], ...report.map((m) => formatAmount(m.categories[key] || 0))]);
+  });
+  appendRow(table, ['Spending', ...report.map((m) => formatAmount(m.spending))], 'report-total');
+  appendRow(table, ['Transfers out (not counted)', ...report.map((m) => formatAmount(m.transfers))], 'report-aside');
+  appendRow(table, ['Money in (not counted)', ...report.map((m) => formatAmount(m.moneyIn))], 'report-aside');
+}
+
 function renderAll() {
   renderLoadWarning();
   renderMonth();
@@ -243,6 +287,7 @@ function renderAll() {
   renderCategoryPlanInputs();
   renderExpenseCategoryOptions();
   renderCategorySummary();
+  renderReport(loadReport());
 }
 
 // Income and the three must-pays: typing saves the amount and updates "left to plan".
@@ -271,6 +316,44 @@ document.getElementById('add-expense-btn').addEventListener('click', () => {
   saveState(state);
   amountInput.value = '';
   renderCategorySummary();
+});
+
+// Shows the statement's report and adds this month's purchases and fees to the
+// actual spending; a transaction that was already added is skipped.
+function importStatement(transactions) {
+  const report = buildReport(transactions);
+  let added = 0;
+  transactions.forEach((tx) => {
+    const id = transactionId(tx);
+    if (tx.kind !== 'spending' || tx.month !== state.month || state.importedIds.includes(id)) return;
+    state.categories[tx.category].actual = roundCents(state.categories[tx.category].actual + tx.moneyOut);
+    state.importedIds.push(id);
+    added += 1;
+  });
+  saveState(state);
+  localStorage.setItem(REPORT_KEY, JSON.stringify(report));
+  renderCategorySummary();
+  renderReport(report);
+
+  const months = report.map((m) => m.month);
+  const read = `Read ${transactions.length} transactions (${months[0]} to ${months[months.length - 1]}).`;
+  document.getElementById('statement-status').textContent = added > 0
+    ? `${read} Added ${added} purchases from ${state.month} to this month's actual spending.`
+    : `${read} Nothing new from ${state.month} to add to this month's actual spending.`;
+}
+
+document.getElementById('statement-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return undefined;
+  const status = document.getElementById('statement-status');
+  status.textContent = 'Reading the statement…';
+  // Returned so the tests can wait for it; the browser ignores it.
+  return file.arrayBuffer()
+    .then(readStatement)
+    .then(importStatement)
+    .catch(() => {
+      status.textContent = 'This file could not be read as a bank statement (.xlsx). Nothing was changed.';
+    });
 });
 
 renderAll();

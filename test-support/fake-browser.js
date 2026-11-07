@@ -4,7 +4,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const APP_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+// statement.js comes first, as in index.html.
+const APP_SOURCE = ['statement.js', 'app.js']
+  .map((file) => fs.readFileSync(path.join(__dirname, '..', file), 'utf8'))
+  .join('\n');
 const STORAGE_KEY = 'budgetPlanner:v1';
 const CATEGORY_KEYS = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other'];
 
@@ -70,6 +73,13 @@ function openApp({ today, saved } = {}) {
       byId('expense-amount').value = String(amount);
       byId('add-expense-btn').handlers.click();
     },
+    // Picks `bytes` in the statement file input; resolves once it is imported.
+    importFile: (bytes) => byId('statement-input').handlers.change({
+      target: { files: [{ arrayBuffer: async () => bytes }] },
+    }),
+    // The statement report table as rows of cell texts.
+    reportRows: () => byId('statement-report').children
+      .map((row) => row.children.map((cell) => cell.textContent)),
     // The texts of the red over-plan warnings currently on the screen.
     warnings: () => byId('category-summary-list').children
       .flatMap((row) => row.children)

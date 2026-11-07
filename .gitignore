@@ -1,2 +1,5 @@
 # Real bank data for the spike stays local
 spike/*-private.csv
+
+# Real bank statements stay local; tests build their own fake .xlsx files
+*.xlsx

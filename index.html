@@ -60,8 +60,23 @@
       <h2>Spending summary</h2>
       <div id="category-summary-list"></div>
     </section>
+
+    <section id="statement-section">
+      <h2>Bank statement report</h2>
+      <p class="hint">Pick your deposit statement (.xlsx). It is read in this browser only; nothing is uploaded.
+        Purchases and fees from this month are added to the actual spending above.</p>
+      <label class="field">
+        Statement
+        <input type="file" id="statement-input" accept=".xlsx">
+      </label>
+      <p id="statement-status" class="hint"></p>
+      <div class="report-scroll">
+        <table id="statement-report"></table>
+      </div>
+    </section>
   </div>
 
+  <script src="statement.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
