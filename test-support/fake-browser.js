@@ -26,11 +26,12 @@ function fakeElement(register) {
   };
 }
 
-// Opens the app with `saved` as the stored data. `today` (e.g. '2026-10-02')
-// freezes the clock; without it the real date is used.
+// Opens the app with `saved` as the stored data (a string is stored as it is,
+// to fake text that is not valid JSON). `today` (e.g. '2026-10-02') freezes the
+// clock; without it the real date is used.
 function openApp({ today, saved } = {}) {
   const store = {};
-  if (saved) store[STORAGE_KEY] = JSON.stringify(saved);
+  if (saved) store[STORAGE_KEY] = typeof saved === 'string' ? saved : JSON.stringify(saved);
   const localStorage = {
     getItem: (key) => (key in store ? store[key] : null),
     setItem: (key, value) => { store[key] = value; },
@@ -55,6 +56,8 @@ function openApp({ today, saved } = {}) {
   const byId = (id) => document.getElementById(id);
   return {
     saved: () => JSON.parse(store[STORAGE_KEY]),
+    // Every stored text, by key, to check nothing the user saved went missing.
+    storedAll: () => ({ ...store }),
     shown: (id) => byId(id).textContent,
     type: (id, value) => byId(id).handlers.input({ target: { value } }),
     plan(category, value) {

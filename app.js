@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'budgetPlanner:v1';
+// Saved text that could not be read is moved here instead of being overwritten.
+const BACKUP_KEY = 'budgetPlanner:v1:unreadable';
 
 const CATEGORY_ORDER = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other'];
 const CATEGORY_LABELS = {
@@ -71,20 +73,27 @@ function normaliseState(parsed) {
   return state;
 }
 
+// Set by loadState when the saved data could not be read.
+let loadProblem = false;
+
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     return makeEmptyState(getCurrentMonthStr());
   }
+  let parsed = null;
   try {
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') {
-      return makeEmptyState(getCurrentMonthStr());
-    }
-    return normaliseState(parsed);
+    parsed = JSON.parse(raw);
   } catch (err) {
+    // Handled below, the same way as valid JSON that is not a budget object.
+  }
+  if (!parsed || typeof parsed !== 'object') {
+    // Keep the old text so the numbers can still be recovered by hand.
+    localStorage.setItem(BACKUP_KEY, raw);
+    loadProblem = true;
     return makeEmptyState(getCurrentMonthStr());
   }
+  return normaliseState(parsed);
 }
 
 function saveState(state) {
@@ -122,6 +131,14 @@ function numOrEmpty(value) {
 
 function renderMonth() {
   document.getElementById('current-month').textContent = state.month;
+}
+
+function renderLoadWarning() {
+  const warning = document.getElementById('load-warning');
+  warning.hidden = !loadProblem;
+  warning.textContent = loadProblem
+    ? `Your saved budget could not be read, so an empty month was started. The old data is kept in this browser's localStorage under "${BACKUP_KEY}".`
+    : '';
 }
 
 function renderIncomeAndMustPays() {
@@ -219,6 +236,7 @@ function renderCategorySummary() {
 }
 
 function renderAll() {
+  renderLoadWarning();
   renderMonth();
   renderIncomeAndMustPays();
   renderLeftToPlan();
