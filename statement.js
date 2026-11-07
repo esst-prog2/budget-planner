@@ -127,7 +127,8 @@ function amountFrom(text) {
 }
 
 // Finds the header row, then turns each dated row below it into a transaction
-// with its kind ('in', 'transfer' or 'spending') and, for spending, a category.
+// with its kind ('in', 'transfer' or 'spending'), for spending a category, and
+// an id (see transactionId).
 function findTransactions(rows) {
   const columnOf = {};
   const headerIndex = rows.findIndex((row) => Object.entries(STATEMENT_HEADERS).every(([key, header]) => {
@@ -137,7 +138,7 @@ function findTransactions(rows) {
   }));
   if (headerIndex === -1) throw new Error('no statement header row');
 
-  return rows.slice(headerIndex + 1)
+  const transactions = rows.slice(headerIndex + 1)
     .filter((row) => /^\d{4}-\d\d-\d\d/.test(row[columnOf.time] || ''))
     .map((row) => {
       const tx = {
@@ -150,6 +151,15 @@ function findTransactions(rows) {
       return { ...tx, ...sortTransaction(tx) };
     })
     .filter((tx) => tx.moneyIn > 0 || tx.moneyOut > 0);
+  // Two identical charges in the same second (e.g. two 100 fees) are both
+  // real: the second gets "#2", the third "#3". The first keeps the plain id,
+  // so statements imported before this still match.
+  const seen = {};
+  return transactions.map((tx) => {
+    const id = transactionId(tx);
+    seen[id] = (seen[id] || 0) + 1;
+    return { ...tx, id: seen[id] === 1 ? id : `${id}#${seen[id]}` };
+  });
 }
 
 async function readStatement(buffer) {
@@ -170,6 +180,6 @@ function transactionId(tx) {
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    STATEMENT_CURRENCY, readStatement, findTransactions, parseSheetRows, categoryFor, sortTransaction, transactionId,
+    STATEMENT_CURRENCY, readStatement, findTransactions, parseSheetRows, categoryFor, sortTransaction,
   };
 }

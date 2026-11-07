@@ -80,7 +80,8 @@ test('import adds this month\'s purchases and fees to the budget, earlier ones t
   assert.strictEqual(state.pastMonths[0].categories.unknown.actual, 45);
   assert.strictEqual(state.carryOver, 0);
   assert.strictEqual(app.shown('statement-status'),
-    'Read 10 transactions (2026-10 to 2026-11). Added 5 purchases to this month and 2 to earlier months in the history.');
+    'Read 10 transactions (2026-10 to 2026-11). Added 5 purchases to this month and 2 to earlier months in the history.'
+    + ' Added 3 transfers or money in to the report.');
 });
 
 test('report per month: spending by category, transfers and money in kept apart', async () => {
@@ -138,4 +139,30 @@ test('a file that is not a statement changes nothing and says so', async () => {
   assert.strictEqual(app.saved().categories.food.actual, 10);
   assert.match(app.shown('statement-status'), /could not be read/);
   assert.deepStrictEqual(app.reportRows()[0], ['', '2026-11']);
+});
+
+test('two identical fees in the same second are two charges, not one', async () => {
+  // Two transfers sent in the same second, each with a 100 fee: 200 in fees.
+  const twoFees = makeXlsx([
+    HEADER,
+    tx('2026-11-06 09:00:00', 0, 100, 'EB -И-БАНК ГҮЙЛГЭЭНИЙ ШИМТГЭЛ'),
+    tx('2026-11-06 09:00:00', 0, 100, 'EB -И-БАНК ГҮЙЛГЭЭНИЙ ШИМТГЭЛ'),
+  ]);
+  const app = openApp({ today: '2026-11-15' });
+  app.setRate('MNT', '1');
+  await app.importFile(twoFees);
+  assert.strictEqual(app.saved().categories.other.actual, 200);
+  // Importing it again still adds nothing.
+  await app.importFile(twoFees);
+  assert.strictEqual(app.saved().categories.other.actual, 200);
+});
+
+test('a statement with only new money in says what it added, not "Nothing new"', async () => {
+  const salaryOnly = makeXlsx([HEADER, tx('2026-11-10 09:00:00', 700, 0, 'tsalin')]);
+  const app = openApp({ today: '2026-11-15' });
+  app.setRate('MNT', '1');
+  await app.importFile(salaryOnly);
+  assert.strictEqual(app.saved().moneyIn, 700);
+  assert.strictEqual(app.shown('statement-status'),
+    'Read 1 transactions (2026-11 to 2026-11). Added 1 transfers or money in to the report.');
 });
