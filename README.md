@@ -55,7 +55,9 @@ Income entered twice: 1,200 entered twice on the same day. The app ask if it is 
 I open `index.html` and type my October numbers: income 300,000 HUF and my rent, phone and transport, 130,000 together, and the screen shows 170000 left to plan. I plan food at 80,000, record a 90,000 grocery shop, and a red warning appears: "Food: 10000 over plan". Under "Exchange rates" I type today's MNT rate and import my bank statement, `customer-deposit-statement-excel.xlsx`: the app reads 215 transactions, and the Monthly report fills with one column per month from August, tögrög converted to forints and sorted into Food, Going out and Unknown. In History, among the imported purchases, I find the 90,000 shop I typed by hand, delete it, and the Food warning disappears and the report updates at once.
 
 ## Run it
-Open `index.html` in a browser; there is no build step and no server. Data stays in the browser's localStorage.
+Start the server with `node server.js` (Node.js 18 or newer, no dependencies, no build step) and open http://127.0.0.1:8765. Opening `index.html` directly no longer saves anything.
+
+All data — every month's income, must-pays, plans, expenses, imported purchases and the exchange rates — is saved in `budget-data.csv` next to the app, one value per row, so it opens in Excel. Every change is written at once. The file is committed to this repository, so it is public. The first time the app runs without the file, the budget saved earlier in the browser's localStorage is moved into it. A file the app cannot read is kept as `budget-data.unreadable-<date>.csv` before a new one is started.
 
 To import a statement, pick the .xlsx file under "Import a bank statement". It is read in the browser only, and only date, category and amount of each purchase are saved. Shops are sorted by name (the list is `CATEGORY_KEYWORDS` in `statement.js`); purchases whose shop is not recognised go to Unknown, bank fees to Other. Keep real statements out of Git: `*.xlsx` is ignored.
 

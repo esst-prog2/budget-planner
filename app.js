@@ -1,3 +1,9 @@
+// The budget is saved in budget-data.csv by server.js (`node server.js`).
+const DATA_URL = '/api/data';
+// A data file that could not be read is copied here before it is overwritten.
+const BACKUP_URL = '/api/data/unreadable';
+// Before the CSV file the budget was kept in the browser under this key; it is
+// moved into the file the first time the app runs without one.
 const STORAGE_KEY = 'budgetPlanner:v1';
 // Saved text that could not be read is moved here instead of being overwritten.
 const BACKUP_KEY = 'budgetPlanner:v1:unreadable';
@@ -180,10 +186,14 @@ function normaliseState(parsed) {
   return state;
 }
 
-// Set by loadState when the saved data could not be read.
-let loadProblem = false;
+// Why the saved budget was not loaded, shown above the app; '' when it was.
+let loadProblem = '';
+// False until the saved budget is loaded, and while the server cannot be
+// reached: nothing is saved then, so the file is never overwritten with an empty month.
+let canSave = false;
 
-function loadState() {
+// The budget saved before the CSV file, in this browser.
+function loadFromBrowser() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     return makeEmptyState(getCurrentMonthStr());
@@ -197,14 +207,79 @@ function loadState() {
   if (!parsed || typeof parsed !== 'object') {
     // Keep the old text so the numbers can still be recovered by hand.
     localStorage.setItem(BACKUP_KEY, raw);
-    loadProblem = true;
+    loadProblem = `Your saved budget could not be read, so an empty month was started. The old data is kept in this browser's localStorage under "${BACKUP_KEY}".`;
     return makeEmptyState(getCurrentMonthStr());
   }
   return normaliseState(parsed);
 }
 
+// Reads budget-data.csv from the server. Without the file, the budget saved in
+// this browser is loaded instead and will be written to the file.
+async function loadState() {
+  let response;
+  try {
+    response = await fetch(DATA_URL, { cache: 'no-store' });
+  } catch (err) {
+    response = null;
+  }
+  if (response && response.status === 404) {
+    canSave = true;
+    return loadFromBrowser();
+  }
+  if (!response || !response.ok) {
+    loadProblem = 'The budget is saved in budget-data.csv by the server, which is not running. Start it with "node server.js" and open http://127.0.0.1:8765. Nothing you type here is saved.';
+    return makeEmptyState(getCurrentMonthStr());
+  }
+  const text = await response.text();
+  const parsed = csvToState(text);
+  if (parsed) {
+    canSave = true;
+    return normaliseState(parsed);
+  }
+  // Copy the unreadable file first; only once the copy is safe may it be overwritten.
+  try {
+    const backup = await fetch(BACKUP_URL, { method: 'PUT', headers: { 'Content-Type': 'text/csv' }, body: text });
+    if (!backup.ok) throw new Error(`backup failed: ${backup.status}`);
+    const kept = await backup.text();
+    canSave = true;
+    loadProblem = `budget-data.csv could not be read, so an empty month was started. The old file is kept as ${kept}.`;
+  } catch (err) {
+    loadProblem = 'budget-data.csv could not be read, and a copy of it could not be made, so it is left as it is. Nothing you type here is saved.';
+  }
+  return makeEmptyState(getCurrentMonthStr());
+}
+
+// Each save sends the whole budget with a growing number; the server skips one
+// that arrives after a later one, so the file always ends with the newest data.
+const PAGE_ID = Math.random().toString(36).slice(2);
+let saveNumber = 0;
+let lastAnswered = 0;
+
+function showSaveProblem(text) {
+  const warning = document.getElementById('save-warning');
+  warning.hidden = !text;
+  warning.textContent = text;
+}
+
 function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if (!canSave) return;
+  saveNumber += 1;
+  const number = saveNumber;
+  const answered = (problem) => {
+    if (number < lastAnswered) return;
+    lastAnswered = number;
+    showSaveProblem(problem);
+  };
+  fetch(DATA_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'text/csv', 'X-Page': PAGE_ID, 'X-Save-Number': String(number) },
+    body: stateToCsv(state),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(`save failed: ${response.status}`);
+      answered('');
+    })
+    .catch(() => answered('Your last change could not be saved to budget-data.csv. Is "node server.js" still running?'));
 }
 
 function sumMustPays(record) {
@@ -235,8 +310,8 @@ function checkAndResetMonth(state) {
   return newState;
 }
 
-let state = checkAndResetMonth(loadState());
-saveState(state);
+// Empty until the saved budget is loaded (see the end of this file).
+let state = makeEmptyState(getCurrentMonthStr());
 
 // The month shown in the history; the current one until another is picked.
 let historyMonth = state.month;
@@ -256,9 +331,7 @@ function renderMonth() {
 function renderLoadWarning() {
   const warning = document.getElementById('load-warning');
   warning.hidden = !loadProblem;
-  warning.textContent = loadProblem
-    ? `Your saved budget could not be read, so an empty month was started. The old data is kept in this browser's localStorage under "${BACKUP_KEY}".`
-    : '';
+  warning.textContent = loadProblem;
 }
 
 function renderIncomeAndMustPays() {
@@ -575,7 +648,7 @@ document.getElementById('add-expense-btn').addEventListener('click', () => {
 });
 
 // A new rate re-converts every month's entries, as the user chose.
-Object.keys(state.rates).forEach((code) => {
+CURRENCIES.filter((code) => code !== BASE_CURRENCY).forEach((code) => {
   document.getElementById(`rate-${code}`).addEventListener('input', (e) => {
     state.rates[code] = parseRate(e.target.value);
     allMonths().forEach((record) => recomputeActuals(record, state.rates));
@@ -661,4 +734,12 @@ document.getElementById('statement-input').addEventListener('change', (e) => {
     });
 });
 
-renderAll();
+// Loads the saved budget, starts a new month if one has begun, and writes the
+// result to the file (the first time, the budget moved from the browser).
+// Kept so the tests can wait for it.
+const started = loadState().then((loaded) => {
+  state = checkAndResetMonth(loaded);
+  saveState(state);
+  historyMonth = state.month;
+  renderAll();
+});

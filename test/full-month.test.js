@@ -30,12 +30,12 @@ function readPlantedMonth() {
   });
 }
 
-test('planted month includes cash expenses', () => {
+test('planted month includes cash expenses', async () => {
   assert.ok(readPlantedMonth().some((row) => row.cash));
 });
 
-test('a full month, cash included, lands in the categories counted by hand', () => {
-  const app = openApp();
+test('a full month, cash included, lands in the categories counted by hand', async () => {
+  const app = await openApp();
   readPlantedMonth().forEach((row) => app.addExpense(row.category, row.amount));
 
   const { categories } = app.saved();
@@ -44,8 +44,8 @@ test('a full month, cash included, lands in the categories counted by hand', () 
   }
 });
 
-test('Other stays under the one-third line from the spike', () => {
-  const app = openApp();
+test('Other stays under the one-third line from the spike', async () => {
+  const app = await openApp();
   readPlantedMonth().forEach((row) => app.addExpense(row.category, row.amount));
 
   const { categories } = app.saved();
