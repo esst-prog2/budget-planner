@@ -144,7 +144,7 @@ Two grounds (navy leather and pale security paper) and three stamp inks; everyth
 - **Paper Band** (paper-band): inline code chips on paper.
 - **Document Ink** (ink): headings and field values.
 - **Soft Ink** (ink-soft): body copy, the lede, the MRZ line.
-- **Field-Label Green** (label): tracked capitals for field labels, the wordmark, page titles, folios, screenshot notes, and their hairline rules (`rgba(74, 99, 82, 0.4)`).
+- **Field-Label Green** (label): tracked capitals for field labels, page titles, folios, screenshot notes, and their hairline rules (`rgba(74, 99, 82, 0.4)`).
 - **Guilloche Green** (guilloche): the linework in `img/guilloche.svg` (at 0.32 stroke opacity), list markers, and the scrollbar thumb. Never text.
 - **Cover Text** (on-cover) and **Soft Cover Text** (on-cover-soft): text on navy (button labels, command text; cover notes and the back cover).
 
@@ -166,7 +166,7 @@ Two grounds (navy leather and pale security paper) and three stamp inks; everyth
 - **Headline** (800, width 112%, clamp(1.6rem, 2.5vw, 2.2rem), 1.08): page headings on spreads.
 - **Title** (800, width 112%, clamp(1.45rem, 2.2vw, 1.9rem), 1.1): the five "month in it" step headings.
 - **Cover title** (800, width 125%, clamp(1.5rem, 3.2vw, 2.6rem), 0.05em, uppercase, foil): section titles embossed on the cover between spreads.
-- **Document caps** (700, width 125%, 0.9–0.95rem, 0.18–0.2em, uppercase, label green, hairline rule below): the wordmark and a page's own title ("Today's entries"), as a document prints its issuing title.
+- **Document caps** (700, width 125%, 0.9–0.95rem, 0.18–0.2em, uppercase, label green, hairline rule below): a page's own title ("Today's entries"), as a document prints its issuing title.
 - **Body** (400, 1.0625rem, 1.6): reading copy, max 46ch on pages; the lede steps up to clamp(1.1rem, 1.4vw, 1.25rem).
 - **Label** (650, 0.72rem, 0.14em, uppercase): field labels (Holder, Lives in, Saved in) in holder fields and on the residence card.
 - **Mono**: the MRZ line, sized to the page (`100cqi / 31`) so its 44 characters stay on one line; rates inside stamps (600, -0.02em, tabular); code chips (0.88em); the command.

@@ -43,15 +43,15 @@ The page follows one student through one month, in the same order as the README 
 
 ### 1. Hero
 
-**Your money speaks tögrög. Budapest charges in forints.**
+**Budget Planner**
 
-A budget planner for international students: every tögrög, euro and dollar turned into forints at today's rate, and your bank statement sorted for you.
+For international students in Budapest. Money from home comes in tögrög, euros or dollars; Budapest charges in forints. Every expense is counted in forints at today's rate, and your bank statement is sorted for you.
 
 Buttons: **Try it in 2 minutes** (jumps to section 5) · **See a month in it** (jumps to section 3)
 
 ### 2. The problem
 
-Your scholarship lands in tögrög. Rent, the BKK pass and groceries are in forints. You add it up at the end of the month with a rate you googled, and only then find out the food money was gone by the 20th.
+Your scholarship comes in forints, and money from family arrives in tögrög, euros or dollars. Rent, the BKK pass and groceries are in forints. You add it all up at the end of the month with a rate you googled, and only then find out the food money was gone by the 20th.
 
 Budget Planner does the adding up as you go, in forints, and warns you the moment a category goes over.
 

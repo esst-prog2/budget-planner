@@ -168,7 +168,7 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2.1rem, 3.4vw, 3.15rem);
+  font-size: clamp(2.8rem, 5.6vw, 5.2rem);
   font-weight: 850;
   font-stretch: 100%;
   line-height: 1.02;
@@ -197,19 +197,6 @@ h3 {
   padding: clamp(24px, 3.4vw, 52px);
   padding-bottom: calc(clamp(24px, 3.4vw, 52px) + 1.5rem);
   min-height: clamp(560px, calc(100vh - 96px), 800px);
-}
-
-.wordmark {
-  margin: 0;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid rgba(74, 99, 82, 0.4);
-  font-family: var(--display);
-  font-size: 0.9rem;
-  font-weight: 700;
-  font-stretch: 125%;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--label);
 }
 
 .page > .lede {
@@ -717,7 +704,6 @@ h3 {
     display: none;
   }
 
-  .spread--open .wordmark { order: 1; }
   .spread--open h1 { order: 2; margin-top: 0.2rem; }
   .spread--open .lede { order: 3; }
   .spread--open .actions { order: 4; }

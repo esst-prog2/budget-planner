@@ -23,7 +23,7 @@ OWN-WORLD: Navy cover leather (#1C2B4A) as the ground between spreads; pale secu
 
 STORY: The visitor sees their own currencies stamped as forints today, reads the problem (adding three currencies up at month end), walks one month in five spreads of the real app, learns their data stays on their computer, and copies the command.
 
-FIRST VIEWPORT: One open spread centred on the navy cover. Left page: wordmark, the headline "Your money speaks tögrög. Budapest charges in forints." at display scale, one line of subcopy, the primary "Try it in 2 minutes" button and "See a month in it", holder fields and an MRZ line spelling only the product. Right page: three tilted entry stamps, ₮ → Ft, € → Ft, $ → Ft, with today's rates and date, and the attribution link.
+FIRST VIEWPORT: One open spread centred on the navy cover. Left page: the product name "Budget Planner" as the headline at display scale (user change, 2026-11-14), a subline naming money from home in tögrög, euros or dollars and spending in forints, the primary "Try it in 2 minutes" button and "See a month in it", holder fields and an MRZ line spelling only the product. Right page: three tilted entry stamps, ₮ → Ft, € → Ft, $ → Ft, with today's rates and date, and the attribution link.
 
 FORM: Passport and Residence Card, Impeccable's pick (grounded list position 1), chosen over the rolled direction; seed:4a59c1c63ad37c0f. Signature interaction: the stamps press once when the live rates arrive (still for reduced motion); the Copy button on the command.
 
