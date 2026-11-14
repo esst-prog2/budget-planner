@@ -143,35 +143,35 @@ h2 {
   overflow-x: auto;
 }
 
-#monthly-report {
+.report-table {
   border-collapse: collapse;
   width: 100%;
   font-size: 0.9rem;
 }
 
-#monthly-report th,
-#monthly-report td {
+.report-table th,
+.report-table td {
   padding: 4px 8px;
   border-bottom: 1px solid var(--border);
   text-align: right;
   white-space: nowrap;
 }
 
-#monthly-report th {
+.report-table th {
   text-align: left;
   font-weight: normal;
 }
 
-#monthly-report .report-head td,
-#monthly-report .report-total {
+.report-table .report-head td,
+.report-table .report-total {
   font-weight: 600;
 }
 
-#monthly-report .report-aside {
+.report-table .report-aside {
   color: var(--muted);
 }
 
-#monthly-report td.over {
+.report-table td.over {
   color: var(--over);
   font-weight: 600;
 }
@@ -222,4 +222,14 @@ h2 {
     --muted: #9aa39d;
     --border: #3a3d3b;
   }
+}
+
+.history-subtitle {
+  font-size: 1rem;
+  margin: 16px 0 6px;
+}
+
+/* A month's inputs: the label left, the amount right, at reading width. */
+#history-inputs {
+  max-width: 420px;
 }

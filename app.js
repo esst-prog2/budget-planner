@@ -369,6 +369,7 @@ function renderCategoryPlanInputs() {
       state.categories[key].plan = parseAmount(input.value);
       saveState(state);
       renderCategorySummary();
+      renderHistory();
       renderReport();
     });
 
@@ -482,8 +483,33 @@ function appendSpan(parent, text, className) {
   parent.appendChild(span);
 }
 
-// The chosen month's expenses, newest first. Only the current month's can be
-// deleted: a past month's leftover has already been carried over.
+// Everything entered for the chosen month, as it was saved: income, carry-over,
+// each must-pay, each category's plan against its spending, and what was left.
+function renderMonthInputs(record) {
+  const title = document.getElementById('history-inputs-title');
+  title.textContent = record === state ? `What you entered for ${record.month} (this month)` : `What you entered for ${record.month}`;
+  const table = document.getElementById('history-inputs');
+  table.innerHTML = '';
+  appendRow(table, ['Carried over', formatAmount(record.carryOver)]);
+  appendRow(table, ['Income', formatAmount(record.income)]);
+  appendRow(table, ['Rent', formatAmount(record.mustPays.rent)]);
+  appendRow(table, ['Phone', formatAmount(record.mustPays.phone)]);
+  appendRow(table, ['Transport', formatAmount(record.mustPays.transport)]);
+  const leftToPlan = roundCents(record.carryOver + record.income - sumMustPays(record));
+  appendRow(table, ['Left to plan', formatAmount(leftToPlan)], 'report-total');
+  CATEGORY_ORDER.forEach((key) => {
+    const { plan, actual } = record.categories[key];
+    appendRow(table, [`${CATEGORY_LABELS[key]} (spent / plan)`, planCell(actual, plan)]);
+  });
+  const planned = roundCents(CATEGORY_ORDER.reduce((sum, key) => sum + record.categories[key].plan, 0));
+  appendRow(table, ['Spending', planCell(sumActuals(record), planned)], 'report-total');
+  const left = computeLeftover(record);
+  appendRow(table, [record === state ? 'Left so far' : 'Left at month end',
+    { text: formatAmount(left), className: left < 0 ? 'over' : '' }], 'report-total');
+}
+
+// The chosen month's inputs and expenses, newest first. Only the current
+// month's can be deleted: a past month's leftover has already been carried over.
 function renderHistory() {
   const select = document.getElementById('history-month');
   select.innerHTML = '';
@@ -496,6 +522,7 @@ function renderHistory() {
   select.value = historyMonth;
 
   const record = allMonths().find((m) => m.month === historyMonth) || state;
+  renderMonthInputs(record);
   const list = document.getElementById('history-list');
   list.innerHTML = '';
   if (record !== state) {
@@ -621,6 +648,7 @@ Object.entries(AMOUNT_INPUTS).forEach(([id, store]) => {
     store(parseAmount(e.target.value));
     saveState(state);
     renderLeftToPlan();
+    renderHistory();
     renderReport();
   });
 });
