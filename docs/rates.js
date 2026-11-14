@@ -22,7 +22,7 @@
     var day = dayText(new Date(data.time_last_update_unix * 1000));
     document.querySelectorAll('[data-rate-date]').forEach(function (el) { el.textContent = day; });
     document.getElementById('rates-note').textContent =
-      "Today's rates, " + day + '. The app fetches them the same way every time it opens.';
+      "Today's rates, " + day + ". The app fetches them the same way when it opens; type your bank's own rate to use that instead.";
     var stamps = document.getElementById('stamps');
     stamps.dataset.state = 'live';
     stamps.classList.add('is-pressing');

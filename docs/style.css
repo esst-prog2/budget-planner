@@ -496,24 +496,31 @@ h3 {
   justify-content: center;
 }
 
+/* A crop of the real app, mounted on the page with photo corners. The crops
+   are taken at phone width and twice the density, so the app's text reads at
+   its own size. */
 .shot {
   position: relative;
-  display: block;
+  align-self: center;
+  width: min(100%, 360px);
+  margin: 0;
+  overflow: hidden;
   border-radius: 6px;
   background: #fff;
   box-shadow: 0 1px 2px rgba(20, 32, 57, 0.12), 0 18px 34px -18px rgba(20, 32, 57, 0.55);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.shot:hover {
-  transform: translateY(-3px);
+.shot--strip {
+  align-self: flex-start;
+  margin-bottom: 0.6rem;
 }
 
-/* Photo corners holding the screenshot on the page. */
+/* Photo corners holding the crop on the page. */
 .shot::before,
 .shot::after {
   content: "";
   position: absolute;
+  z-index: 1;
   width: 22px;
   height: 22px;
   background: var(--cover);
@@ -521,34 +528,116 @@ h3 {
 }
 
 .shot::before {
-  z-index: 1;
   top: 0;
   left: 0;
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 .shot::after {
-  z-index: 1;
   bottom: 0;
   right: 0;
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
-.shot {
-  overflow: hidden;
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-.page .shot-note {
+/* The report, pasted across the gutter of its own spread. */
+.spread--pasted .page {
+  grid-row: 1;
+}
+
+.spread--pasted .page--left {
+  grid-column: 1;
+}
+
+.spread--pasted .page--right {
+  grid-column: 2;
+}
+
+.pasted {
+  position: relative;
+  z-index: 1;
+  grid-row: 1;
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-self: center;
+  width: min(100% - 2 * clamp(16px, 4vw, 64px), 720px);
+  margin: clamp(32px, 5vw, 72px) 0 calc(clamp(32px, 5vw, 72px) + 1.5rem);
+  padding: 14px 14px 12px;
+  border-radius: 4px;
+  background: #fff;
+  transform: rotate(-0.8deg);
+  box-shadow: 0 1px 2px rgba(20, 32, 57, 0.15), 0 22px 40px -20px rgba(20, 32, 57, 0.6);
+}
+
+/* Two strips of tape holding the sheet. */
+.pasted::before,
+.pasted::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  width: 92px;
+  height: 26px;
+  background: rgba(226, 231, 222, 0.82);
+  box-shadow: 0 1px 2px rgba(20, 32, 57, 0.12);
+}
+
+.pasted::before {
+  left: 8%;
+  transform: rotate(-4deg);
+}
+
+.pasted::after {
+  right: 8%;
+  transform: rotate(3deg);
+}
+
+.pasted img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pasted figcaption {
+  margin-top: 0.6rem;
   font-size: 0.88rem;
   color: var(--label);
 }
 
-.shot img {
-  display: block;
-  width: 165%;
-  max-width: none;
-  height: auto;
-  margin-left: -32.5%;
+/* ---------- Run it ---------- */
+
+.run-steps {
+  margin: 0;
+  padding-left: 1.4rem;
+}
+
+.run-steps > li {
+  margin: 0 0 1.1rem;
+  padding-left: 0.2rem;
+}
+
+.run-steps > li::marker {
+  font-family: var(--display);
+  font-weight: 800;
+  color: var(--cover);
+}
+
+.run-steps .command {
+  margin: 0.6rem 0 0;
+}
+
+.page .run-note {
+  font-size: 0.92rem;
+}
+
+/* No word left alone on the last line of a paragraph. */
+.page p,
+.page li {
+  text-wrap: pretty;
 }
 
 /* ---------- On the cover ---------- */
@@ -754,6 +843,33 @@ h3 {
   .residence-card dl > div {
     grid-template-columns: 1fr;
     gap: 0.15rem;
+  }
+
+  /* The report is wider than a phone: it keeps its size and scrolls
+     sideways, as it does in the app. */
+  .spread--pasted {
+    display: block;
+  }
+
+  .spread--pasted .page {
+    display: none;
+  }
+
+  .pasted {
+    width: auto;
+    margin: 0;
+    overflow-x: auto;
+    transform: none;
+  }
+
+  .pasted::before,
+  .pasted::after {
+    display: none;
+  }
+
+  .pasted img {
+    width: 661px;
+    max-width: none;
   }
 }
 

@@ -23,9 +23,9 @@
     <section class="spread spread--open spread--cascade" aria-labelledby="headline">
       <div class="page page--left">
         <h1 id="headline">Budget Planner</h1>
-        <p class="lede">For international students in Budapest. A scholarship or salary comes in forints, money from home in tögrög, euros or dollars, and Budapest charges in forints. Every income and expense is counted in forints at today's rate, and your bank statement is sorted for you.</p>
+        <p class="lede">Your scholarship or salary comes in forints, money from home in tögrög, euros or dollars. Budget Planner counts every income and expense in forints at today's rate, sorts your Mongolian bank statement, and warns you the moment a category goes over.</p>
         <div class="actions">
-          <a class="button" href="#try">Try it in 2 minutes</a>
+          <a class="button" href="#try">Run it in 2 minutes</a>
           <a class="link" href="#month">See a month in it</a>
         </div>
         <dl class="holder">
@@ -33,6 +33,7 @@
           <div><dt>Lives in</dt><dd>Budapest</dd></div>
           <div><dt>Brings</dt><dd>MNT · EUR · USD</dd></div>
           <div><dt>Spends</dt><dd>HUF</dd></div>
+          <div><dt>Runs on</dt><dd>Your own computer</dd></div>
         </dl>
         <p class="mrz" aria-hidden="true">P&lt;BUDGET&lt;PLANNER&lt;&lt;MNT&lt;EUR&lt;USD&lt;&lt;TO&lt;HUF&lt;&lt;&lt;&lt;&lt;&lt;&lt;</p>
         <span class="folio" aria-hidden="true">2</span>
@@ -56,7 +57,7 @@
             <p class="stamp__meta"><span data-rate-date>14 Nov 2026</span><br>Budapest</p>
           </figure>
         </div>
-        <p class="rates-note" id="rates-note">Rates from 14 Nov 2026. The app fetches today's rates the same way every time it opens.</p>
+        <p class="rates-note" id="rates-note">Rates from 14 Nov 2026. The app fetches today's rates the same way when it opens; type your bank's own rate to use that instead.</p>
         <p class="attribution"><a href="https://www.exchangerate-api.com" rel="noopener">Rates By Exchange Rate API</a></p>
         <span class="folio" aria-hidden="true">3</span>
       </div>
@@ -70,79 +71,62 @@
         <span class="folio" aria-hidden="true">4</span>
       </div>
       <div class="page page--right page--centred">
-        <p>Budget Planner does the adding up as you go, in forints, and warns you the moment a category goes over.</p>
-        <p class="stamp stamp--red stamp--wide" role="img" aria-label="Warning stamp: Food: 10000 over plan">Food: 10000 over plan</p>
+        <p>Budget Planner does the adding up as you go, in forints, and warns you the moment a category goes over its plan.</p>
+        <p class="stamp stamp--red stamp--wide" role="img" aria-label="Warning stamp: Food: 10 000 Ft over plan">Food: 10 000 Ft over plan</p>
         <span class="folio" aria-hidden="true">5</span>
       </div>
     </section>
 
     <h2 class="cover-title" id="month">A month in it</h2>
+    <p class="cover-note">From the app's demo with a made-up bank statement, not anyone's real budget. Every amount is in forints.</p>
 
     <section class="spread spread--step" aria-labelledby="step-1">
       <div class="page page--left">
         <h3 id="step-1">Set up your month</h3>
-        <p>Add each income in its own currency: a scholarship or salary in forints, family aid in tögrög, euros or dollars, then the three must-pays: rent, phone, transport. The app shows what is left to plan right away.</p>
-        <p class="quote">170000 left to plan</p>
+        <p>Add each income in its own currency: a scholarship or salary in forints, family aid in tögrög, euros or dollars. Then the three must-pays: rent, phone, transport. What is left to plan shows right away.</p>
         <span class="folio" aria-hidden="true">6</span>
       </div>
       <div class="page page--right">
-        <a class="shot" data-impeccable-ignore="nested-cards" href="img/01-income-and-must-pays.png"><img src="img/01-income-and-must-pays.png" width="1000" height="710" loading="lazy" alt="The app's Income section with a form for name, amount and currency and one income, Scholarship 300000, then Must-pay expenses: rent 110000, phone 8000, transport 12000, and 'Left to plan: 170000'."></a>
+        <figure class="shot" data-impeccable-ignore="nested-cards"><img src="img/step-left-to-plan.png" width="348" height="387" loading="lazy" alt="In the app: an income 'Scholarship 300000', 'Income this month: 300000', must-pays rent 110000, phone 8000 and transport 12000, and 'Left to plan: 170000'."></figure>
         <span class="folio" aria-hidden="true">7</span>
       </div>
     </section>
 
     <section class="spread spread--step" aria-labelledby="step-2">
       <div class="page page--left">
+        <figure class="shot shot--strip" data-impeccable-ignore="nested-cards"><img src="img/step-over-plan.png" width="348" height="121" loading="lazy" alt="In the app's spending summary: Food 90000 of an 80000 plan, a full red bar, and the warning 'Food: 10000 over plan'."></figure>
         <h3 id="step-2">Plan, and get warned</h3>
-        <p>Give each category a plan. Go over it, and a red warning appears.</p>
-        <p class="quote quote--over">Food: 10000 over plan</p>
+        <p>Give each category a plan, and record what you spend in forints, tögrög, euros or dollars. The moment a category goes over its plan, a red warning appears.</p>
         <span class="folio" aria-hidden="true">8</span>
       </div>
       <div class="page page--right">
-        <a class="shot" data-impeccable-ignore="nested-cards" href="img/02-food-over-plan.png"><img src="img/02-food-over-plan.png" width="1000" height="738" loading="lazy" alt="Recording a 90000 food expense; the spending summary shows Food at 90000 of an 80000 plan with a red bar and the warning 'Food: 10000 over plan'."></a>
+        <h3 id="step-3">Import your Mongolian bank statement</h3>
+        <p>Pick the deposit statement (.xlsx) your Mongolian bank gives you. The app reads it in your browser, sorts each purchase by the shop's name into Food, Going out or Unknown, converts the tögrög to forints, and keeps transfers and money in apart from your spending.</p>
+        <p class="quote">Read 30 transactions (2026-08 to 2026-11)</p>
         <span class="folio" aria-hidden="true">9</span>
       </div>
     </section>
 
-    <section class="spread spread--step" aria-labelledby="step-3">
-      <div class="page page--left">
-        <h3 id="step-3">Every currency in forints</h3>
-        <p>Today's rates for tögrög, euro and dollar are filled in for you. If your bank's rate differs, type your own. Expenses in any of the four currencies are counted in forints.</p>
-        <span class="folio" aria-hidden="true">10</span>
-      </div>
-      <div class="page page--right">
-        <a class="shot" data-impeccable-ignore="nested-cards" href="img/03-import-statement.png"><img src="img/03-import-statement.png" width="1000" height="375" loading="lazy" alt="The app's Exchange rates section: 'Today's rates, 14 Nov 2026, from Exchange Rate API', with 1 MNT = 0.0913884, 1 EUR = 364.964 and 1 USD = 330.579 forints."></a>
-        <span class="folio" aria-hidden="true">11</span>
-      </div>
+    <section class="spread spread--pasted" aria-label="The monthly report">
+      <div class="page page--left" aria-hidden="true"><span class="folio">10</span></div>
+      <div class="page page--right" aria-hidden="true"><span class="folio">11</span></div>
+      <figure class="pasted" data-impeccable-ignore="nested-cards">
+        <img src="img/step-report.png" width="661" height="430" loading="lazy" alt="The monthly report, one column per month from 2026-08 to 2026-11: spending per category in forints with November's food 94185.59 over its 80000 plan in red, income, must-pays, transfers and money in from the statement listed apart, and the MNT rate each month used.">
+        <figcaption>Each month in its own column, in forints. In the app this table scrolls sideways; here it is shown in full.</figcaption>
+      </figure>
     </section>
 
     <section class="spread spread--step" aria-labelledby="step-4">
       <div class="page page--left">
-        <h3 id="step-4">Import your bank statement</h3>
-        <p>Pick the statement .xlsx your bank gives you. The app reads it in your browser, sorts each purchase into Food, Going out or Unknown by the shop's name, puts each month in its own column, and keeps transfers and money in apart from your spending.</p>
-        <p class="quote">Read 30 transactions (2026-08 to 2026-11)</p>
+        <h3 id="step-4">Fix a mistake, look back</h3>
+        <p>Every income and expense is in the History with its date and time. Delete a wrong one and the warnings and the report update at once. Pick any earlier month to see what you planned and what was left.</p>
         <span class="folio" aria-hidden="true">12</span>
       </div>
       <div class="page page--right">
-        <a class="shot" data-impeccable-ignore="nested-cards" href="img/05-monthly-report.png"><img src="img/05-monthly-report.png" width="1000" height="556" loading="lazy" alt="The monthly report with one column per month from 2026-08: spending per category in forints (Food, Clothes, Gym, Subscriptions, Going out, Other, Unknown), income, must-pays, and transfers and money in from the statement listed apart."></a>
-        <p class="shot-note">The report scrolls sideways in the app; here it shows August to October.</p>
+        <figure class="shot" data-impeccable-ignore="nested-cards"><img src="img/step-past-month.png" width="348" height="486" loading="lazy" alt="In the app's History for October 2026: carried over, income, rent, phone, transport, left to plan, each category's spending, total spending and 'Left at month end'."></figure>
         <span class="folio" aria-hidden="true">13</span>
       </div>
     </section>
-
-    <section class="spread spread--step" aria-labelledby="step-5">
-      <div class="page page--left">
-        <h3 id="step-5">Fix a mistake, look back</h3>
-        <p>Every expense, typed or imported, is in the History with its date and time. Delete a wrong one and the warnings and the report update at once. Pick any earlier month to see what you planned and what was left.</p>
-        <span class="folio" aria-hidden="true">14</span>
-      </div>
-      <div class="page page--right">
-        <a class="shot" data-impeccable-ignore="nested-cards" href="img/10-history-past-month.png"><img src="img/10-history-past-month.png" width="1000" height="923" loading="lazy" alt="The History for October 2026: what was entered for the month, each category's spending, 'Left at month end', and the month's imported expenses with their tögrög amounts in forints."></a>
-        <span class="folio" aria-hidden="true">15</span>
-      </div>
-    </section>
-
-    <p class="cover-note">The screenshots show the app's demo with a made-up bank statement, not anyone's real budget.</p>
 
     <!-- The residence card -->
     <section class="card-section" aria-labelledby="data">
@@ -158,27 +142,35 @@
       </div>
     </section>
 
-    <!-- Try it -->
+    <!-- Run it -->
     <section class="spread" id="try" aria-labelledby="try-title">
       <div class="page page--left">
-        <h2 id="try-title">Try it yourself in 2 minutes</h2>
-        <p>You need Node.js 18 or newer. Nothing else to install.</p>
-        <p>Open <code>http://127.0.0.1:8766</code>, then import <code>demo/sample-statement.xlsx</code>: a made-up statement in a real Mongolian bank's format, with 30 transactions from August to November. The demo always starts from an empty budget.</p>
+        <h2 id="try-title">Run it on your computer in 2 minutes</h2>
+        <p>Budget Planner is not a website: it runs on your own computer, in your browser. You need Git and Node.js 18 or newer, on Windows, macOS or Linux.</p>
+        <p>No Git? <a class="link" href="https://github.com/esst-prog2/budget-planner/archive/refs/heads/main.zip">Download the ZIP</a>, unpack it, and run <code>node server.js --demo</code> in that folder.</p>
         <p><a class="link" href="https://github.com/esst-prog2/budget-planner">Source on GitHub</a></p>
-        <span class="folio" aria-hidden="true">16</span>
+        <span class="folio" aria-hidden="true">14</span>
       </div>
       <div class="page page--right">
-        <div class="command">
-          <pre id="command"><code>git clone https://github.com/<wbr>esst-prog2/<wbr>budget-planner
+        <ol class="run-steps">
+          <li>
+            <p>Copy the commands and run them in a terminal:</p>
+            <div class="command">
+              <pre id="command"><code>git clone https://github.com/<wbr>esst-prog2/<wbr>budget-planner
 cd budget-planner
 node server.js --demo</code></pre>
-          <button class="button button--copy" type="button" id="copy" aria-describedby="copy-status">
-            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4.5v-.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 4v7A1.5 1.5 0 0 0 5 12.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-            <span>Copy the commands</span>
-          </button>
-          <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
-        </div>
-        <span class="folio" aria-hidden="true">17</span>
+              <button class="button button--copy" type="button" id="copy" aria-describedby="copy-status">
+                <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4.5v-.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 4v7A1.5 1.5 0 0 0 5 12.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                <span>Copy the commands</span>
+              </button>
+              <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+            </div>
+          </li>
+          <li><p>Open <code>http://127.0.0.1:8766</code> in your browser.</p></li>
+          <li><p>Under "Import a bank statement", pick <code>demo/sample-statement.xlsx</code>: a made-up statement in a real Mongolian bank's format, 30 transactions from August to November.</p></li>
+        </ol>
+        <p class="run-note">The demo starts empty every time. For your own budget, run <code>node server.js</code> and open <code>http://127.0.0.1:8765</code>.</p>
+        <span class="folio" aria-hidden="true">15</span>
       </div>
     </section>
 
@@ -190,15 +182,20 @@ node server.js --demo</code></pre>
           <li>Plain HTML, CSS and JavaScript. No frameworks, no dependencies, no build step.</li>
           <li>A small Node server that serves the app and writes the CSV file.</li>
           <li>The .xlsx statement is unzipped in the browser with its built-in DecompressionStream, so there is no spreadsheet library.</li>
-          <li>73 automated tests (<code>node --test</code>), including the sample statement import.</li>
-          <li>Planned with OpenSpec; every decision is in PLANNING_LOG.md and every step in PROCESS.md.</li>
+          <li>80 automated tests (<code>node --test</code>), including the sample statement import, live rates and income in several currencies.</li>
+          <li>Planned with <a class="link" href="https://github.com/esst-prog2/budget-planner/tree/main/openspec">OpenSpec</a>; every decision is in <a class="link" href="https://github.com/esst-prog2/budget-planner/blob/main/PLANNING_LOG.md">PLANNING_LOG.md</a> and every step in <a class="link" href="https://github.com/esst-prog2/budget-planner/blob/main/PROCESS.md">PROCESS.md</a>.</li>
         </ul>
-        <span class="folio" aria-hidden="true">18</span>
+        <span class="folio" aria-hidden="true">16</span>
       </div>
       <div class="page page--right">
         <h2>What it doesn't do (yet)</h2>
-        <p>The budget is in forints only. Categories are fixed: Food, Clothes, Gym, Subscriptions, Going out, Other, Unknown. No savings goals, no phone notifications.</p>
-        <span class="folio" aria-hidden="true">19</span>
+        <ul>
+          <li>Bank statements from other banks: only the Mongolian deposit statement format is read.</li>
+          <li>Must-pays and plans are in forints only.</li>
+          <li>Categories are fixed: Food, Clothes, Gym, Subscriptions, Going out, Other, Unknown.</li>
+          <li>No savings goals, no phone notifications, no phone app: it needs a computer.</li>
+        </ul>
+        <span class="folio" aria-hidden="true">17</span>
       </div>
     </section>
   </main>

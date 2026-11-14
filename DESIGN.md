@@ -19,7 +19,7 @@ colors:
 typography:
   display:
     fontFamily: "Archivo, Arial Narrow, sans-serif"
-    fontSize: "clamp(2.1rem, 3.4vw, 3.15rem)"
+    fontSize: "clamp(2.8rem, 5.6vw, 5.2rem)"
     fontWeight: 850
     lineHeight: 1.02
     letterSpacing: "-0.02em"
@@ -162,7 +162,7 @@ Two grounds (navy leather and pale security paper) and three stamp inks; everyth
 **Character:** One grotesque family stretched across its width axis: expanded (112–125%) and heavy for document headings and stamps, normal width for reading. The mono is the machine voice of the document: the MRZ line, the rates, code and the command.
 
 ### Hierarchy
-- **Display** (850, clamp(2.1rem, 3.4vw, 3.15rem), 1.02): the opening headline only.
+- **Display** (850, clamp(2.8rem, 5.6vw, 5.2rem), 1.02): the opening headline only, the product name "Budget Planner".
 - **Headline** (800, width 112%, clamp(1.6rem, 2.5vw, 2.2rem), 1.08): page headings on spreads.
 - **Title** (800, width 112%, clamp(1.45rem, 2.2vw, 1.9rem), 1.1): the five "month in it" step headings.
 - **Cover title** (800, width 125%, clamp(1.5rem, 3.2vw, 2.6rem), 0.05em, uppercase, foil): section titles embossed on the cover between spreads.
