@@ -285,6 +285,39 @@ h3 {
   color: var(--ink-soft);
 }
 
+/* The opening spread (layout chosen with /impeccable generate): the left page
+   groups headline, action and holder fields at the top with the MRZ line at
+   its foot; the stamps step diagonally down the visa page, overlapping like a
+   page stamped over a semester. Phones keep the stacked order below. */
+@media (min-width: 861px) {
+  .spread--cascade .holder {
+    margin-top: 2.4rem;
+  }
+
+  .spread--cascade .mrz {
+    margin-top: auto;
+  }
+
+  .spread--cascade .stamps {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    padding-block: 1.2rem;
+  }
+
+  .spread--cascade .stamp:nth-child(2) {
+    margin-left: 24%;
+    margin-top: -1.44rem;
+  }
+
+  .spread--cascade .stamp:nth-child(3) {
+    margin-left: 46%;
+    margin-top: -1.44rem;
+  }
+}
+
 /* ---------- Stamps ---------- */
 
 .page .page-title {
