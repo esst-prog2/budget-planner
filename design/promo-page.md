@@ -75,7 +75,7 @@ Budget Planner does the adding up as you go, in forints, and warns you the momen
 You need Node.js 18 or newer. Nothing else to install.
 
 ```
-git clone https://github.com/esst-prog2/budget-planner.git
+git clone https://github.com/esst-prog2/budget-planner
 cd budget-planner
 node server.js --demo
 ```
@@ -87,7 +87,7 @@ Open http://127.0.0.1:8766, then import `demo/sample-statement.xlsx`: a made-up 
 - Plain HTML, CSS and JavaScript. No frameworks, no dependencies, no build step.
 - A small Node server that serves the app and writes the CSV file.
 - The .xlsx statement is unzipped in the browser with its built-in DecompressionStream, so there is no spreadsheet library.
-- 65 automated tests (`node --test`), including the sample statement import.
+- 73 automated tests (`node --test`), including the sample statement import.
 - Planned with OpenSpec; every decision is in PLANNING_LOG.md and every step in PROCESS.md.
 
 ### 7. What it doesn't do (yet)

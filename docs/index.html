@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Planner: your money in forints</title>
+  <meta name="description" content="A budget planner for international students in Budapest: every tögrög, euro and dollar turned into forints at today's rate, and your bank statement sorted for you.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" focusable="false" class="defs">
+    <filter id="ink" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2"/>
+    </filter>
+  </svg>
+
+  <main>
+    <!-- Spread 1: the opened passport -->
+    <section class="spread spread--open" aria-labelledby="headline">
+      <div class="page page--left">
+        <p class="wordmark">Budget Planner</p>
+        <h1 id="headline">Your money speaks tögrög.<br> Budapest charges in forints.</h1>
+        <p class="lede">A budget planner for international students: every tögrög, euro and dollar turned into forints at today's rate, and your bank statement sorted for you.</p>
+        <div class="actions">
+          <a class="button" href="#try">Try it in 2 minutes</a>
+          <a class="link" href="#month">See a month in it</a>
+        </div>
+        <dl class="holder">
+          <div><dt>Holder</dt><dd>International student</dd></div>
+          <div><dt>Lives in</dt><dd>Budapest</dd></div>
+          <div><dt>Brings</dt><dd>MNT · EUR · USD</dd></div>
+          <div><dt>Spends</dt><dd>HUF</dd></div>
+        </dl>
+        <p class="mrz" aria-hidden="true">P&lt;BUDGET&lt;PLANNER&lt;&lt;MNT&lt;EUR&lt;USD&lt;&lt;TO&lt;HUF&lt;&lt;&lt;&lt;&lt;&lt;&lt;</p>
+        <span class="folio" aria-hidden="true">2</span>
+      </div>
+      <div class="page page--right">
+        <h2 class="page-title">Today's entries</h2>
+        <div class="stamps" id="stamps" data-state="static">
+          <figure class="stamp stamp--violet">
+            <p class="stamp__route">₮ <span aria-hidden="true">→</span><span class="visually-hidden">to</span> Ft</p>
+            <p class="stamp__rate"><span class="stamp__one">1 MNT =</span> <span data-rate="MNT">0.0914</span> Ft</p>
+            <p class="stamp__meta"><span data-rate-date>14 Nov 2026</span><br>Budapest</p>
+          </figure>
+          <figure class="stamp stamp--red">
+            <p class="stamp__route">€ <span aria-hidden="true">→</span><span class="visually-hidden">to</span> Ft</p>
+            <p class="stamp__rate"><span class="stamp__one">1 EUR =</span> <span data-rate="EUR">364.96</span> Ft</p>
+            <p class="stamp__meta"><span data-rate-date>14 Nov 2026</span><br>Budapest</p>
+          </figure>
+          <figure class="stamp stamp--green">
+            <p class="stamp__route">$ <span aria-hidden="true">→</span><span class="visually-hidden">to</span> Ft</p>
+            <p class="stamp__rate"><span class="stamp__one">1 USD =</span> <span data-rate="USD">330.58</span> Ft</p>
+            <p class="stamp__meta"><span data-rate-date>14 Nov 2026</span><br>Budapest</p>
+          </figure>
+        </div>
+        <p class="rates-note" id="rates-note">Rates from 14 Nov 2026. The app fetches today's rates the same way every time it opens.</p>
+        <p class="attribution"><a href="https://www.exchangerate-api.com" rel="noopener">Rates By Exchange Rate API</a></p>
+        <span class="folio" aria-hidden="true">3</span>
+      </div>
+    </section>
+
+    <!-- Spread 2: the problem -->
+    <section class="spread" aria-labelledby="problem">
+      <div class="page page--left">
+        <h2 id="problem">At the end of the month it's too late</h2>
+        <p>Your scholarship lands in tögrög. Rent, the BKK pass and groceries are in forints. You add it up at the end of the month with a rate you googled, and only then find out the food money was gone by the 20th.</p>
+        <span class="folio" aria-hidden="true">4</span>
+      </div>
+      <div class="page page--right page--centred">
+        <p>Budget Planner does the adding up as you go, in forints, and warns you the moment a category goes over.</p>
+        <p class="stamp stamp--red stamp--wide" role="img" aria-label="Warning stamp: Food: 10000 over plan">Food: 10000 over plan</p>
+        <span class="folio" aria-hidden="true">5</span>
+      </div>
+    </section>
+
+    <h2 class="cover-title" id="month">A month in it</h2>
+
+    <section class="spread spread--step" aria-labelledby="step-1">
+      <div class="page page--left">
+        <h3 id="step-1">Set up your month</h3>
+        <p>Type your income and the three must-pays: rent, phone, transport. The app shows what is left to plan right away.</p>
+        <p class="quote">170000 left to plan</p>
+        <span class="folio" aria-hidden="true">6</span>
+      </div>
+      <div class="page page--right">
+        <a class="shot" data-impeccable-ignore="nested-cards" href="img/01-income-and-must-pays.png"><img src="img/01-income-and-must-pays.png" width="1000" height="441" loading="lazy" alt="The app's Income and Must-pay sections: monthly income 300000, rent 110000, phone 8000, transport 12000, and 'Left to plan: 170000'."></a>
+        <span class="folio" aria-hidden="true">7</span>
+      </div>
+    </section>
+
+    <section class="spread spread--step" aria-labelledby="step-2">
+      <div class="page page--left">
+        <h3 id="step-2">Plan, and get warned</h3>
+        <p>Give each category a plan. Go over it, and a red warning appears.</p>
+        <p class="quote quote--over">Food: 10000 over plan</p>
+        <span class="folio" aria-hidden="true">8</span>
+      </div>
+      <div class="page page--right">
+        <a class="shot" data-impeccable-ignore="nested-cards" href="img/02-food-over-plan.png"><img src="img/02-food-over-plan.png" width="1000" height="738" loading="lazy" alt="Recording a 90000 food expense; the spending summary shows Food at 90000 of an 80000 plan with a red bar and the warning 'Food: 10000 over plan'."></a>
+        <span class="folio" aria-hidden="true">9</span>
+      </div>
+    </section>
+
+    <section class="spread spread--step" aria-labelledby="step-3">
+      <div class="page page--left">
+        <h3 id="step-3">Every currency in forints</h3>
+        <p>Today's rates for tögrög, euro and dollar are filled in for you. If your bank's rate differs, type your own. Expenses in any of the four currencies are counted in forints.</p>
+        <span class="folio" aria-hidden="true">10</span>
+      </div>
+      <div class="page page--right">
+        <a class="shot" data-impeccable-ignore="nested-cards" href="img/03-import-statement.png"><img src="img/03-import-statement.png" width="1000" height="375" loading="lazy" alt="The app's Exchange rates section: 'Today's rates, 14 Nov 2026, from Exchange Rate API', with 1 MNT = 0.0913884, 1 EUR = 364.964 and 1 USD = 330.579 forints."></a>
+        <span class="folio" aria-hidden="true">11</span>
+      </div>
+    </section>
+
+    <section class="spread spread--step" aria-labelledby="step-4">
+      <div class="page page--left">
+        <h3 id="step-4">Import your bank statement</h3>
+        <p>Pick the statement .xlsx your bank gives you. The app reads it in your browser, sorts each purchase into Food, Going out or Unknown by the shop's name, puts each month in its own column, and keeps transfers and money in apart from your spending.</p>
+        <p class="quote">Read 30 transactions (2026-08 to 2026-11)</p>
+        <span class="folio" aria-hidden="true">12</span>
+      </div>
+      <div class="page page--right">
+        <a class="shot" data-impeccable-ignore="nested-cards" href="img/05-monthly-report.png"><img src="img/05-monthly-report.png" width="1000" height="556" loading="lazy" alt="The monthly report with one column per month from 2026-08: spending per category in forints (Food, Clothes, Gym, Subscriptions, Going out, Other, Unknown), income, must-pays, and transfers and money in from the statement listed apart."></a>
+        <p class="shot-note">The report scrolls sideways in the app; here it shows August to October.</p>
+        <span class="folio" aria-hidden="true">13</span>
+      </div>
+    </section>
+
+    <section class="spread spread--step" aria-labelledby="step-5">
+      <div class="page page--left">
+        <h3 id="step-5">Fix a mistake, look back</h3>
+        <p>Every expense, typed or imported, is in the History with its date and time. Delete a wrong one and the warnings and the report update at once. Pick any earlier month to see what you planned and what was left.</p>
+        <span class="folio" aria-hidden="true">14</span>
+      </div>
+      <div class="page page--right">
+        <a class="shot" data-impeccable-ignore="nested-cards" href="img/10-history-past-month.png"><img src="img/10-history-past-month.png" width="1000" height="923" loading="lazy" alt="The History for October 2026: what was entered for the month, each category's spending, 'Left at month end', and the month's imported expenses with their tögrög amounts in forints."></a>
+        <span class="folio" aria-hidden="true">15</span>
+      </div>
+    </section>
+
+    <p class="cover-note">The screenshots show the app's demo with a made-up bank statement, not anyone's real budget.</p>
+
+    <!-- The residence card -->
+    <section class="card-section" aria-labelledby="data">
+      <h2 class="cover-title" id="data">Your data stays on your computer</h2>
+      <div class="residence-card">
+        <p class="residence-card__title">Residence card · Your budget</p>
+        <dl>
+          <div><dt>Saved in</dt><dd>One file, <code>budget-data.csv</code>, next to the app. It opens in Excel.</dd></div>
+          <div><dt>Runs on</dt><dd>Your own computer only (127.0.0.1). Nobody else can reach it.</dd></div>
+          <div><dt>Bank statement</dt><dd>Read in your browser and never uploaded. Only the date, category and amount of each purchase are saved.</dd></div>
+          <div><dt>Sent online</dt><dd>Only the currency code "HUF", to fetch the rates. None of your numbers.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Try it -->
+    <section class="spread" id="try" aria-labelledby="try-title">
+      <div class="page page--left">
+        <h2 id="try-title">Try it yourself in 2 minutes</h2>
+        <p>You need Node.js 18 or newer. Nothing else to install.</p>
+        <p>Open <code>http://127.0.0.1:8766</code>, then import <code>demo/sample-statement.xlsx</code>: a made-up statement in a real Mongolian bank's format, with 30 transactions from August to November. The demo always starts from an empty budget.</p>
+        <p><a class="link" href="https://github.com/esst-prog2/budget-planner">Source on GitHub</a></p>
+        <span class="folio" aria-hidden="true">16</span>
+      </div>
+      <div class="page page--right">
+        <div class="command">
+          <pre id="command"><code>git clone https://github.com/<wbr>esst-prog2/<wbr>budget-planner
+cd budget-planner
+node server.js --demo</code></pre>
+          <button class="button button--copy" type="button" id="copy" aria-describedby="copy-status">
+            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4.5v-.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 4v7A1.5 1.5 0 0 0 5 12.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            <span>Copy the commands</span>
+          </button>
+          <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+        </div>
+        <span class="folio" aria-hidden="true">17</span>
+      </div>
+    </section>
+
+    <!-- Built / not yet -->
+    <section class="spread" aria-labelledby="built">
+      <div class="page page--left">
+        <h2 id="built">How it's built</h2>
+        <ul>
+          <li>Plain HTML, CSS and JavaScript. No frameworks, no dependencies, no build step.</li>
+          <li>A small Node server that serves the app and writes the CSV file.</li>
+          <li>The .xlsx statement is unzipped in the browser with its built-in DecompressionStream, so there is no spreadsheet library.</li>
+          <li>73 automated tests (<code>node --test</code>), including the sample statement import.</li>
+          <li>Planned with OpenSpec; every decision is in PLANNING_LOG.md and every step in PROCESS.md.</li>
+        </ul>
+        <span class="folio" aria-hidden="true">18</span>
+      </div>
+      <div class="page page--right">
+        <h2>What it doesn't do (yet)</h2>
+        <p>The budget is in forints only. Categories are fixed: Food, Clothes, Gym, Subscriptions, Going out, Other, Unknown. No savings goals, no phone notifications.</p>
+        <span class="folio" aria-hidden="true">19</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="back-cover">
+    <p>A course project for Advanced Programming, ELTE, 2026</p>
+    <p><a href="https://github.com/esst-prog2/budget-planner">Source on GitHub</a> · <a href="https://www.exchangerate-api.com" rel="noopener">Rates By Exchange Rate API</a></p>
+  </footer>
+
+  <script src="rates.js"></script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T19:35:43.595Z",
+  "title": "Design System: Budget Planner promo page",
+  "extensions": {
+    "scope": "Promo page in docs/ only. The Budget Planner app at the project root (index.html, style.css) keeps its own plain look and is not part of this world.",
+    "colorMeta": {
+      "cover": {
+        "role": "primary",
+        "displayName": "Cover Leather Navy",
+        "canonical": "#1c2b4a",
+        "oklch": "oklch(29.3% 0.060 263.6)",
+        "tonalRamp": [
+          "#050b18",
+          "#1b2538",
+          "#35425b",
+          "#516182",
+          "#7183a5",
+          "#96a5c3",
+          "#bccae3",
+          "#e4efff"
+        ]
+      },
+      "cover-deep": {
+        "role": "primary",
+        "displayName": "Deep Cover Navy",
+        "canonical": "#142039",
+        "oklch": "oklch(24.7% 0.051 263.7)",
+        "tonalRamp": [
+          "#060b16",
+          "#1d2535",
+          "#374257",
+          "#53617d",
+          "#74839f",
+          "#98a5bf",
+          "#becadf",
+          "#e6efff"
+        ]
+      },
+      "foil": {
+        "role": "primary",
+        "displayName": "Foil Gold",
+        "canonical": "#c9a85a",
+        "oklch": "oklch(74.5% 0.105 86.8)",
+        "tonalRamp": [
+          "#140900",
+          "#332200",
+          "#553e00",
+          "#795d0a",
+          "#9c7e36",
+          "#bba268",
+          "#dcc798",
+          "#feedc8"
+        ]
+      },
+      "on-cover": {
+        "role": "neutral",
+        "displayName": "Cover Text",
+        "canonical": "#e7ecf5",
+        "oklch": "oklch(94.2% 0.013 262.4)",
+        "tonalRamp": [
+          "#0a0b0e",
+          "#232529",
+          "#3f4248",
+          "#5d6168",
+          "#7e828a",
+          "#a1a5ac",
+          "#c6c9cf",
+          "#eceef3"
+        ]
+      },
+      "on-cover-soft": {
+        "role": "neutral",
+        "displayName": "Soft Cover Text",
+        "canonical": "#aab6ca",
+        "oklch": "oklch(77.3% 0.032 260.7)",
+        "tonalRamp": [
+          "#080b12",
+          "#1f252f",
+          "#3b424f",
+          "#586272",
+          "#788394",
+          "#9ca6b5",
+          "#c2cad7",
+          "#e9eff9"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Security Paper",
+        "canonical": "#eef0ea",
+        "oklch": "oklch(95.2% 0.008 121.6)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#252523",
+          "#41433f",
+          "#60625d",
+          "#81837e",
+          "#a4a6a1",
+          "#c8cac6",
+          "#eeefec"
+        ]
+      },
+      "paper-band": {
+        "role": "neutral",
+        "displayName": "Paper Band",
+        "canonical": "#e2e7de",
+        "oklch": "oklch(92.2% 0.013 130.8)",
+        "tonalRamp": [
+          "#0a0c09",
+          "#242622",
+          "#40433e",
+          "#5f635c",
+          "#80847c",
+          "#a3a6a0",
+          "#c7cac5",
+          "#edefeb"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Document Ink",
+        "canonical": "#18202f",
+        "oklch": "oklch(24.3% 0.031 262.6)",
+        "tonalRamp": [
+          "#080b12",
+          "#20252f",
+          "#3b424f",
+          "#586272",
+          "#798394",
+          "#9da5b5",
+          "#c2c9d6",
+          "#e9eff9"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "#364254",
+        "oklch": "oklch(37.6% 0.035 258.3)",
+        "tonalRamp": [
+          "#070b12",
+          "#1e2530",
+          "#394351",
+          "#566274",
+          "#778396",
+          "#9ba6b7",
+          "#c1cad8",
+          "#e8effa"
+        ]
+      },
+      "label": {
+        "role": "neutral",
+        "displayName": "Field-Label Green",
+        "canonical": "#4a6352",
+        "oklch": "oklch(47.4% 0.041 154.9)",
+        "tonalRamp": [
+          "#050e08",
+          "#1b2920",
+          "#35473b",
+          "#516858",
+          "#718979",
+          "#96ab9c",
+          "#bdcec2",
+          "#e5f3e9"
+        ]
+      },
+      "guilloche": {
+        "role": "neutral",
+        "displayName": "Guilloche Green",
+        "canonical": "#6e8f7a",
+        "oklch": "oklch(61.9% 0.049 156.8)",
+        "tonalRamp": [
+          "#040e07",
+          "#182a1f",
+          "#31483a",
+          "#4c6957",
+          "#6d8b77",
+          "#92ad9b",
+          "#bad0c1",
+          "#e2f4e8"
+        ]
+      },
+      "stamp-violet": {
+        "role": "secondary",
+        "displayName": "Visa Violet",
+        "canonical": "#5b3f8c",
+        "oklch": "oklch(43.7% 0.124 297.9)",
+        "tonalRamp": [
+          "#0f0421",
+          "#2a1a46",
+          "#49346e",
+          "#6a5199",
+          "#8b72be",
+          "#ac98da",
+          "#cfbff6",
+          "#f3e7ff"
+        ]
+      },
+      "stamp-red": {
+        "role": "secondary",
+        "displayName": "Entry Red",
+        "canonical": "#b3322b",
+        "oklch": "oklch(51.4% 0.167 27.7)",
+        "tonalRamp": [
+          "#240000",
+          "#4d0103",
+          "#781915",
+          "#a7322b",
+          "#cf564c",
+          "#eb8377",
+          "#ffaea3",
+          "#ffdad0"
+        ]
+      },
+      "stamp-green": {
+        "role": "secondary",
+        "displayName": "Visa Green",
+        "canonical": "#2f6b4f",
+        "oklch": "oklch(47.9% 0.078 161.1)",
+        "tonalRamp": [
+          "#001006",
+          "#092c1d",
+          "#204c37",
+          "#386e54",
+          "#599074",
+          "#83b199",
+          "#aed4bf",
+          "#d9f7e6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The opening headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page headings on spreads, expanded to width 112%."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "The five 'month in it' step headings."
+      },
+      "document-caps": {
+        "displayName": "Document Caps",
+        "purpose": "Wordmark and a page's own title, uppercase label green with a hairline rule; cover titles use the same voice in foil at clamp(1.5rem, 3.2vw, 2.6rem)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading copy on pages, max 46ch."
+      },
+      "label": {
+        "displayName": "Field Label",
+        "purpose": "Uppercase tracked labels for holder fields and residence card rows."
+      },
+      "mono": {
+        "displayName": "Machine Line",
+        "purpose": "MRZ line, rates, code chips, the command."
+      }
+    },
+    "shadows": [
+      {
+        "name": "passport-on-cover",
+        "value": "drop-shadow(0 2px 1px rgba(205,211,199,0.9)) drop-shadow(0 26px 34px rgba(4,10,24,0.55))",
+        "purpose": "Filter on every spread; the first layer reads as stacked page edges."
+      },
+      {
+        "name": "spine",
+        "value": "inset 34px 0 34px -30px rgba(28,43,74,0.38)",
+        "purpose": "Inner edge of each page (mirrored on the left page; moves to the seam when stacked)."
+      },
+      {
+        "name": "mounted-photo",
+        "value": "0 1px 2px rgba(20,32,57,0.12), 0 18px 34px -18px rgba(20,32,57,0.55)",
+        "purpose": "Screenshots pasted on a page."
+      },
+      {
+        "name": "laminated-card",
+        "value": "0 28px 56px -20px rgba(4,10,24,0.8)",
+        "purpose": "The residence card on the cover."
+      },
+      {
+        "name": "pressed-button",
+        "value": "0 1px 0 rgba(255,255,255,0.15) inset, 0 6px 14px -8px rgba(20,32,57,0.7)",
+        "purpose": "Primary buttons."
+      },
+      {
+        "name": "command-block",
+        "value": "0 16px 30px -18px rgba(4,10,24,0.9)",
+        "purpose": "The command block."
+      },
+      {
+        "name": "stamp-double-rule",
+        "value": "inset 0 0 0 5px var(--paper), inset 0 0 0 6.5px currentColor",
+        "purpose": "Not depth: the inner rule of a stamp. Stamps never cast shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "All transitions and the stamp press."
+      },
+      {
+        "name": "state-change",
+        "value": "0.2s",
+        "purpose": "Button background and press."
+      },
+      {
+        "name": "photo-lift",
+        "value": "0.25s, translateY(-3px)",
+        "purpose": "Screenshot hover."
+      },
+      {
+        "name": "stamp-press",
+        "value": "0.55s, scale 1.08 → 0.985 → 1, opacity 0.55 → 0.92, stagger 0.14s",
+        "purpose": "Stamps press once when live rates arrive; none under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "860px",
+        "purpose": "Spreads become one column; the opening spread becomes one reordered sheet."
+      },
+      {
+        "name": "phone-narrow",
+        "value": "420px",
+        "purpose": "Stamps drop min-width and the rate line may wrap."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid action: navy cover fill, violet on hover. Used for Try it and Copy the commands.",
+      "html": "<div class=\"ds-paper\"><a class=\"ds-btn\" href=\"#\">Try it in 2 minutes</a></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-btn{display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 1.35rem;border:0;border-radius:8px;background:var(--cover);color:var(--on-cover);font-family:var(--display);font-size:1rem;font-weight:700;font-stretch:112%;text-decoration:none;cursor:pointer;box-shadow:0 1px 0 rgba(255,255,255,.15) inset,0 6px 14px -8px rgba(20,32,57,.7);transition:background-color .2s cubic-bezier(0.16, 1, 0.3, 1),transform .2s cubic-bezier(0.16, 1, 0.3, 1)} .ds-btn:hover{background:var(--violet)} .ds-btn:active{transform:translateY(1px)} .ds-btn:focus-visible{outline:3px solid var(--violet);outline-offset:3px}"
+    },
+    {
+      "name": "Copy Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary button with an inline 18px SVG copy icon beside the command block, and its green status line.",
+      "html": "<div class=\"ds-paper\"><button class=\"ds-btn\" type=\"button\"><svg viewBox=\"0 0 20 20\" width=\"18\" height=\"18\" aria-hidden=\"true\"><rect x=\"6.5\" y=\"6.5\" width=\"10\" height=\"10\" rx=\"1.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"/><path d=\"M13.5 4.5v-.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 4v7A1.5 1.5 0 0 0 5 12.5h.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"/></svg><span>Copy the commands</span></button><p class=\"ds-status\">Copied. Paste it into a terminal.</p></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-btn{display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 1.35rem;border:0;border-radius:8px;background:var(--cover);color:var(--on-cover);font-family:var(--display);font-size:1rem;font-weight:700;font-stretch:112%;text-decoration:none;cursor:pointer;box-shadow:0 1px 0 rgba(255,255,255,.15) inset,0 6px 14px -8px rgba(20,32,57,.7);transition:background-color .2s cubic-bezier(0.16, 1, 0.3, 1),transform .2s cubic-bezier(0.16, 1, 0.3, 1)} .ds-btn:hover{background:var(--violet)} .ds-btn:active{transform:translateY(1px)} .ds-btn:focus-visible{outline:3px solid var(--violet);outline-offset:3px} .ds-status{margin:.8rem 0 0;font-family:var(--text);font-size:.92rem;font-weight:650;color:var(--green)}"
+    },
+    {
+      "name": "Text Link",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Secondary action in cover navy with a 1.5px underline; violet on hover.",
+      "html": "<div class=\"ds-paper\"><a class=\"ds-link\" href=\"#\">See a month in it</a></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-link{font-family:var(--text);font-weight:650;color:var(--cover);text-decoration-thickness:1.5px;text-underline-offset:.22em} .ds-link:hover{color:var(--violet)} .ds-link:focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:4px}"
+    },
+    {
+      "name": "Entry Stamp (violet)",
+      "kind": "custom",
+      "refersTo": "stamp-violet",
+      "description": "Signature: a rubber stamp pressing a rate in forints onto the paper; double rule, tilt, multiplied ink.",
+      "html": "<div class=\"ds-paper\"><figure class=\"ds-stamp ds-stamp-violet\" style=\"--r:-6deg\"><p class=\"ds-stamp-route\">₮ → Ft</p><p class=\"ds-stamp-rate\">1 MNT = <b>0.0914</b> Ft</p><p class=\"ds-stamp-meta\">14 Nov 2026<br>Budapest</p></figure></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-stamp{display:inline-block;margin:12px;padding:1.1rem 1.3rem;border:3px solid currentColor;border-radius:16px;box-shadow:inset 0 0 0 5px var(--paper),inset 0 0 0 6.5px currentColor;font-family:var(--display);font-stretch:125%;text-align:center;line-height:1.15;mix-blend-mode:multiply;opacity:.92;transform:rotate(var(--r,0deg))} .ds-stamp p{margin:0} .ds-stamp-route{font-size:2rem;font-weight:900;letter-spacing:.02em;white-space:nowrap} .ds-stamp-rate{margin-top:.35rem;font-size:1.2rem;font-weight:750} .ds-stamp-rate b{font-family:var(--mono);font-weight:600;letter-spacing:-.02em} .ds-stamp-meta{margin-top:.4rem;font-size:.7rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase} .ds-stamp-violet{color:var(--violet)}"
+    },
+    {
+      "name": "Entry Stamp (red oval)",
+      "kind": "custom",
+      "refersTo": "stamp-red",
+      "description": "The oval red stamp; red also marks every over-plan warning.",
+      "html": "<div class=\"ds-paper\"><figure class=\"ds-stamp ds-stamp-red\" style=\"--r:5deg\"><p class=\"ds-stamp-route\">€ → Ft</p><p class=\"ds-stamp-rate\">1 EUR = <b>364.96</b> Ft</p><p class=\"ds-stamp-meta\">14 Nov 2026<br>Budapest</p></figure></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-stamp{display:inline-block;margin:12px;padding:1.1rem 1.3rem;border:3px solid currentColor;border-radius:16px;box-shadow:inset 0 0 0 5px var(--paper),inset 0 0 0 6.5px currentColor;font-family:var(--display);font-stretch:125%;text-align:center;line-height:1.15;mix-blend-mode:multiply;opacity:.92;transform:rotate(var(--r,0deg))} .ds-stamp p{margin:0} .ds-stamp-route{font-size:2rem;font-weight:900;letter-spacing:.02em;white-space:nowrap} .ds-stamp-rate{margin-top:.35rem;font-size:1.2rem;font-weight:750} .ds-stamp-rate b{font-family:var(--mono);font-weight:600;letter-spacing:-.02em} .ds-stamp-meta{margin-top:.4rem;font-size:.7rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase} .ds-stamp-red{color:var(--red);border-radius:50% / 42%;padding:1.5rem 1.9rem}"
+    },
+    {
+      "name": "Warning Stamp",
+      "kind": "custom",
+      "refersTo": "stamp-red",
+      "description": "Wide red uppercase stamp that stamps an over-plan warning onto a page.",
+      "html": "<div class=\"ds-paper\"><p class=\"ds-stamp ds-stamp-wide\">Food: 10000 over plan</p></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-stamp{display:inline-block;margin:12px;padding:1.1rem 1.3rem;border:3px solid currentColor;border-radius:16px;box-shadow:inset 0 0 0 5px var(--paper),inset 0 0 0 6.5px currentColor;font-family:var(--display);font-stretch:125%;text-align:center;line-height:1.15;mix-blend-mode:multiply;opacity:.92;transform:rotate(var(--r,0deg))} .ds-stamp p{margin:0} .ds-stamp-route{font-size:2rem;font-weight:900;letter-spacing:.02em;white-space:nowrap} .ds-stamp-rate{margin-top:.35rem;font-size:1.2rem;font-weight:750} .ds-stamp-rate b{font-family:var(--mono);font-weight:600;letter-spacing:-.02em} .ds-stamp-meta{margin-top:.4rem;font-size:.7rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase} .ds-stamp-wide{--r:-3deg;color:var(--red);padding:.8rem 1.4rem;border-radius:10px;font-size:1.25rem;font-weight:850;text-transform:uppercase}"
+    },
+    {
+      "name": "Passport Page",
+      "kind": "card",
+      "refersTo": "page",
+      "description": "Security paper, document-caps title with hairline rule, holder fields and a mono MRZ line.",
+      "html": "<div class=\"ds-page\"><p class=\"ds-caps\">Budget Planner</p><h2 class=\"ds-h\">Your money speaks tögrög.</h2><dl class=\"ds-holder\"><div><dt>Holder</dt><dd>International student</dd></div><div><dt>Spends</dt><dd>HUF</dd></div></dl><p class=\"ds-mrz\">P&lt;BUDGET&lt;PLANNER&lt;&lt;MNT&lt;EUR&lt;USD&lt;&lt;TO&lt;HUF</p></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;}  .ds-page{display:flex;flex-direction:column;gap:1.1rem;padding:32px;background:var(--paper);border-radius:14px 0 0 14px;box-shadow:inset -34px 0 34px -30px rgba(28,43,74,.38);color:var(--ink);font-family:var(--text)} .ds-page p,.ds-page dl{margin:0} .ds-caps{padding-bottom:.7rem;border-bottom:1px solid rgba(74,99,82,.4);font-family:var(--display);font-size:.9rem;font-weight:700;font-stretch:125%;letter-spacing:.2em;text-transform:uppercase;color:var(--label)} .ds-h{margin:0;font-family:var(--display);font-size:2rem;font-weight:850;line-height:1.02;letter-spacing:-.02em} .ds-holder{display:grid;grid-template-columns:1fr 1fr;gap:.8rem 1.4rem} .ds-holder dt{font-size:.72rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--label)} .ds-holder dd{margin:.1rem 0 0;font-weight:650} .ds-mrz{font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;white-space:nowrap;overflow:hidden;color:var(--ink-soft)}"
+    },
+    {
+      "name": "Residence Card",
+      "kind": "card",
+      "refersTo": "residence-card-title",
+      "description": "The one laminated object: iridescent card on the navy cover with a foil title band and label/value rows.",
+      "html": "<div class=\"ds-cover\"><div class=\"ds-card\"><p class=\"ds-card-title\">Residence card · Your budget</p><dl><div><dt>Saved in</dt><dd>One file, next to the app.</dd></div><div><dt>Runs on</dt><dd>Your own computer only.</dd></div></dl></div></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;}  .ds-cover{padding:28px;background:var(--cover)} .ds-card{max-width:600px;overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.55);background:linear-gradient(128deg,#e8eef3 0%,#dbe5ec 46%,#e8e2ef 72%,#e3ebe4 100%);box-shadow:0 28px 56px -20px rgba(4,10,24,.8);font-family:var(--text);color:var(--ink)} .ds-card-title{margin:0;padding:.9rem 1.6rem;background:var(--cover-deep);color:var(--foil);font-family:var(--display);font-size:.85rem;font-weight:750;font-stretch:125%;letter-spacing:.16em;text-transform:uppercase} .ds-card dl{margin:0;padding:1.4rem 1.6rem 1.7rem;display:grid;gap:1rem} .ds-card dl>div{display:grid;grid-template-columns:9.5rem 1fr;gap:1rem;align-items:baseline} .ds-card dt{font-size:.72rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--label)} .ds-card dd{margin:0}"
+    },
+    {
+      "name": "Command Block",
+      "kind": "custom",
+      "refersTo": "command-block",
+      "description": "Deep-navy block of mono commands that wraps only after '/'.",
+      "html": "<div class=\"ds-paper\"><pre class=\"ds-cmd\"><code>git clone https://github.com/<wbr>esst-prog2/<wbr>budget-planner\ncd budget-planner\nnode server.js --demo</code></pre></div>",
+      "css": ":host{--cover:#1c2b4a;--cover-deep:#142039;--foil:#c9a85a;--on-cover:#e7ecf5;--on-cover-soft:#aab6ca;--paper:#eef0ea;--paper-band:#e2e7de;--ink:#18202f;--ink-soft:#364254;--label:#4a6352;--guilloche:#6e8f7a;--violet:#5b3f8c;--red:#b3322b;--green:#2f6b4f;--display:\"Archivo\",\"Arial Narrow\",sans-serif;--text:\"Archivo\",system-ui,sans-serif;--mono:\"JetBrains Mono\",ui-monospace,monospace;} .ds-paper{padding:24px;background:var(--paper);border-radius:14px} .ds-cmd{margin:0;padding:1.1rem;overflow-x:auto;background:var(--cover-deep);border-radius:10px;box-shadow:0 16px 30px -18px rgba(4,10,24,.9)} .ds-cmd code{font-family:var(--mono);font-size:.9rem;line-height:1.75;white-space:pre-wrap;color:var(--on-cover)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Passport and Residence Card",
+    "overview": "The page is one passport, opened on its navy leather cover. Each section is a two-page spread of pale security paper printed with authored green guilloche linework; the visitor turns spreads from the opening page (holder fields, a machine-readable line) through the visa page where three rubber stamps press today's exchange rates in forints, then a month of the real app pasted in like mounted photos, a laminated residence card that states where the data lives, and finally the command to run it. The cover between spreads carries the section titles in foil capitals, as if embossed.\n\nDensity is document-like: generous page padding, short measures (46ch), small tracked capitals for field labels, and a single display headline per spread. Ornament is never free: the guilloche, the stamps, the photo corners and the MRZ line are all things real identity documents carry, and each one holds content (a rate, a screenshot, the product name). The page refuses the fintech landing: no headline beside a laptop, no row of three feature cards.",
+    "keyCharacteristics": [
+      "Navy cover as the ground; paper pages as the only reading surface.",
+      "Spreads of two pages that stack into one sheet below 860px.",
+      "Rubber-stamp inks (violet, red, green) multiplied onto the paper with a rough displaced edge.",
+      "Expanded grotesque capitals for document headings; a mono for the MRZ, rates, code and the command.",
+      "One laminated residence card on the cover, the only iridescent surface.",
+      "Motion is one gesture: stamps press once when live rates arrive."
+    ],
+    "rules": [
+      {
+        "name": "The Two Grounds Rule",
+        "body": "Text sits on paper or on navy, never on anything else. Paper takes ink; navy takes foil or cover text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Means Something Rule",
+        "body": "Stamp inks are reserved for stamps, warnings, and state (violet for interaction, red for over-plan, green for success). No ink as a decorative fill.",
+        "section": "colors"
+      },
+      {
+        "name": "The Width Axis Rule",
+        "body": "Hierarchy is carried by Archivo's width axis as much as by size: document voice is expanded (112–125%), reading voice is normal width. Don't introduce a second display family.",
+        "section": "typography"
+      },
+      {
+        "name": "The Machine Line Rule",
+        "body": "Mono is for what a machine reads or a person types: MRZ, rates, file names, URLs, commands. Not for labels or headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ink Has No Height Rule",
+        "body": "Stamps never cast shadows. They are ink multiplied into the paper (`mix-blend-mode: multiply`, opacity 0.92), roughened by the shared `#ink` SVG displacement filter.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put all reading content on paper pages; the cover carries only foil titles, short notes and the residence card.",
+      "**Do** keep stamp inks for stamps, warnings and state: violet for interaction and focus, red for over-plan, green for success.",
+      "**Do** carry document voice with Archivo's width axis (112–125%) and tracked uppercase labels in label green with a hairline rule.",
+      "**Do** use the mono for machine text: MRZ, rates, file names, URLs, commands.",
+      "**Do** keep stamps flat ink: multiply blend, the `#ink` displacement filter, a small tilt, no shadow.",
+      "**Do** show the real app in screenshots with demo data, mounted with photo corners.",
+      "**Do** stack spreads to one column below 860px, keeping reading order.",
+      "**Do** keep motion to the single stamp press, and still for reduced motion."
+    ],
+    "donts": [
+      "**Don't** apply this world to the Budget Planner app itself; it keeps its own plain look.",
+      "**Don't** build a fintech landing: no headline beside a device mockup, no row of three feature cards.",
+      "**Don't** print real-looking ID data (names, birth dates, document numbers) in holder fields or the MRZ; spell only the product.",
+      "**Don't** set text on the guilloche green or use foil on paper.",
+      "**Don't** add drop shadows to stamps or to text.",
+      "**Don't** introduce a second display family or a system display face."
+    ]
+  }
+}
