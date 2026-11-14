@@ -126,6 +126,9 @@ async function openApp({ today, saved, csv, server = true, failSaves = false, fa
     // The monthly report table as rows of cell texts.
     reportRows: () => byId('monthly-report').children
       .map((row) => row.children.map((cell) => cell.textContent)),
+    // The chosen month's inputs in the history as { label: amount }.
+    monthInputs: () => Object.fromEntries(byId('history-inputs').children
+      .map((row) => row.children.map((cell) => cell.textContent))),
     // The class of each report cell, e.g. 'over' for a red one.
     reportClasses: () => byId('monthly-report').children
       .map((row) => row.children.map((cell) => cell.className)),
