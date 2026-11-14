@@ -86,3 +86,4 @@
 2026-11-14 — The sample statement is written by demo/make-sample-statement.js (same layout as the real one, fake name and account 0000000000): 30 transactions from 2026-08 to 2026-11, sorted into Food (8), Going out (7), Unknown (6), Other (2 fees), 2 transfers and 5 money in; a test checks the committed file matches the script — decided by: agent
 2026-11-14 — The README demo starts the app with `node server.js --demo` instead of opening index.html, since only the server saves data now — decided by: user
 2026-11-14 — `--demo` uses its own file, demo/demo-budget.csv (ignored by Git), deleted at every start so the demo begins empty, and its own address, 127.0.0.1:8766, so neither my real budget-data.csv nor the old browser data of 8765 is read or changed — decided by: agent
+2026-11-14 — After each step: commit, and add a row to PROCESS.md (step, what the tool did, what I decided); the rule is in AGENTS.md — decided by: user
