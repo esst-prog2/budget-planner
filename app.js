@@ -62,6 +62,9 @@ function makeEmptyMonth(month) {
   return {
     month,
     carryOver: 0,
+    // Money coming in this month: { time, label, amount, currency }, e.g. a
+    // scholarship in HUF and family aid in MNT. income is their total in HUF.
+    incomes: [],
     income: 0,
     mustPays: { rent: 0, phone: 0, transport: 0 },
     categories: makeEmptyCategories(),
@@ -120,13 +123,19 @@ function numberOr(value, fallback) {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-// Each category's actual spending in HUF: the sum of its entries at the month's rates.
-function recomputeActuals(record) {
+// The month's income and each category's actual spending in HUF, from its
+// entries at the month's rates.
+function recomputeTotals(record) {
+  record.income = roundCents(record.incomes.reduce((sum, income) => sum + toHuf(income.amount, income.currency, record.rates), 0));
   CATEGORY_ORDER.forEach((key) => {
     const entries = record.entries.filter((entry) => entry.category === key);
     const total = entries.reduce((sum, entry) => sum + toHuf(entry.amount, entry.currency, record.rates), 0);
     record.categories[key].actual = roundCents(total);
   });
+}
+
+function isIncome(income) {
+  return income && typeof income.amount === 'number' && Number.isFinite(income.amount) && income.amount > 0;
 }
 
 function isEntry(entry) {
@@ -151,7 +160,17 @@ function normaliseMonth(parsed, fallbackMonth, fallbackRates) {
   const record = makeEmptyMonth(typeof parsed.month === 'string' ? parsed.month : fallbackMonth);
   record.rates = readRates(parsed.rates, fallbackRates);
   record.carryOver = numberOr(parsed.carryOver, 0);
-  record.income = numberOr(parsed.income, 0);
+  if (Array.isArray(parsed.incomes)) {
+    record.incomes = parsed.incomes.filter(isIncome).map((income) => ({
+      time: typeof income.time === 'string' ? income.time : null,
+      label: typeof income.label === 'string' ? income.label.slice(0, 40) : '',
+      amount: roundCents(income.amount),
+      currency: CURRENCIES.includes(income.currency) ? income.currency : BASE_CURRENCY,
+    }));
+  } else if (numberOr(parsed.income, 0) > 0) {
+    // Saved when income was one number in HUF: it becomes one entry.
+    record.incomes = [{ time: null, label: '', amount: roundCents(parsed.income), currency: BASE_CURRENCY }];
+  }
   const mustPays = parsed.mustPays || {};
   Object.keys(record.mustPays).forEach((key) => {
     record.mustPays[key] = numberOr(mustPays[key], 0);
@@ -206,7 +225,7 @@ function normaliseState(parsed) {
   }
   state.ratesDate = typeof parsed.ratesDate === 'string' ? parsed.ratesDate : '';
   fillMissingRates(state);
-  allMonthsOf(state).forEach(recomputeActuals);
+  allMonthsOf(state).forEach(recomputeTotals);
   return state;
 }
 
@@ -381,9 +400,29 @@ function renderLoadWarning() {
   warning.textContent = loadProblem;
 }
 
+// This month's incomes, in the order they were added, each deletable.
+function renderIncomes() {
+  const list = document.getElementById('income-list');
+  list.innerHTML = '';
+  state.incomes.forEach((income, index) => {
+    const row = document.createElement('div');
+    row.className = 'history-row income-row';
+    appendSpan(row, income.label || 'Income', 'history-category');
+    appendSpan(row, amountText(income, state.rates), 'history-amount');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'delete-btn';
+    button.textContent = 'Delete';
+    button.setAttribute('aria-label', `Delete income ${income.label || ''} ${amountText(income, state.rates)}`.replace('  ', ' '));
+    button.addEventListener('click', () => deleteIncome(index));
+    row.appendChild(button);
+    list.appendChild(row);
+  });
+  document.getElementById('income-total').textContent = formatAmount(state.income);
+}
+
 function renderIncomeAndMustPays() {
   document.getElementById('carry-over').textContent = formatAmount(state.carryOver);
-  document.getElementById('income-input').value = numOrEmpty(state.income);
   document.getElementById('rent-input').value = numOrEmpty(state.mustPays.rent);
   document.getElementById('phone-input').value = numOrEmpty(state.mustPays.phone);
   document.getElementById('transport-input').value = numOrEmpty(state.mustPays.transport);
@@ -437,8 +476,8 @@ function renderExpenseCategoryOptions() {
   });
 }
 
-function renderExpenseCurrencyOptions() {
-  const select = document.getElementById('expense-currency');
+function renderCurrencyOptions(id) {
+  const select = document.getElementById(id);
   select.innerHTML = '';
   CURRENCIES.forEach((code) => {
     const option = document.createElement('option');
@@ -484,7 +523,7 @@ function renderRates() {
 function renderRateWarning() {
   const missing = {};
   allMonths().forEach((record) => {
-    record.entries.forEach((entry) => {
+    [...record.incomes, ...record.entries].forEach((entry) => {
       if (rateOf(entry.currency, record.rates) === 0) missing[entry.currency] = (missing[entry.currency] || 0) + 1;
     });
     if ((record.transfers > 0 || record.moneyIn > 0) && rateOf(STATEMENT_CURRENCY, record.rates) === 0) {
@@ -563,6 +602,9 @@ function renderMonthInputs(record) {
   table.innerHTML = '';
   appendRow(table, ['Carried over', formatAmount(record.carryOver)]);
   appendRow(table, ['Income', formatAmount(record.income)]);
+  record.incomes.forEach((income) => {
+    appendRow(table, [`  ${income.label || 'Income'}`, amountText(income, record.rates)], 'report-aside');
+  });
   appendRow(table, ['Rent', formatAmount(record.mustPays.rent)]);
   appendRow(table, ['Phone', formatAmount(record.mustPays.phone)]);
   appendRow(table, ['Transport', formatAmount(record.mustPays.transport)]);
@@ -685,8 +727,11 @@ function renderReport() {
   });
 }
 
-// Everything that shows spending: the summary, the history and the report.
+// Everything that shows converted amounts: income, left to plan, the summary,
+// the history and the report.
 function renderSpending() {
+  renderIncomes();
+  renderLeftToPlan();
   renderRateWarning();
   renderCategorySummary();
   renderHistory();
@@ -700,21 +745,50 @@ function renderAll() {
   renderLeftToPlan();
   renderCategoryPlanInputs();
   renderExpenseCategoryOptions();
-  renderExpenseCurrencyOptions();
+  renderCurrencyOptions('expense-currency');
+  renderCurrencyOptions('income-currency');
   renderRates();
   renderSpending();
 }
 
 function deleteEntry(index) {
   state.entries.splice(index, 1);
-  recomputeActuals(state);
+  recomputeTotals(state);
   saveState(state);
   renderSpending();
 }
 
-// Income and the three must-pays: typing saves the amount and updates "left to plan".
+function deleteIncome(index) {
+  state.incomes.splice(index, 1);
+  recomputeTotals(state);
+  saveState(state);
+  renderSpending();
+}
+
+document.getElementById('add-income-btn').addEventListener('click', () => {
+  const labelInput = document.getElementById('income-label');
+  const amountInput = document.getElementById('income-amount');
+  const amount = parseAmount(amountInput.value);
+  const currency = document.getElementById('income-currency').value;
+  const message = document.getElementById('income-message');
+  if (amount <= 0) {
+    return;
+  }
+  if (rateOf(currency, state.rates) === 0) {
+    message.textContent = `Enter the ${currency} rate under "Exchange rates" first; the income was not added.`;
+    return;
+  }
+  message.textContent = '';
+  state.incomes.push({ time: getNowStr(), label: labelInput.value.trim().slice(0, 40), amount, currency });
+  recomputeTotals(state);
+  saveState(state);
+  labelInput.value = '';
+  amountInput.value = '';
+  renderSpending();
+});
+
+// The three must-pays: typing saves the amount and updates "left to plan".
 const AMOUNT_INPUTS = {
-  'income-input': (amount) => { state.income = amount; },
   'rent-input': (amount) => { state.mustPays.rent = amount; },
   'phone-input': (amount) => { state.mustPays.phone = amount; },
   'transport-input': (amount) => { state.mustPays.transport = amount; },
@@ -744,7 +818,7 @@ document.getElementById('add-expense-btn').addEventListener('click', () => {
   }
   message.textContent = '';
   state.entries.push({ time: getNowStr(), category, amount, currency, source: 'typed' });
-  recomputeActuals(state);
+  recomputeTotals(state);
   saveState(state);
   amountInput.value = '';
   historyMonth = state.month;
@@ -765,7 +839,7 @@ RATE_CODES.forEach((code) => {
       state.rates[code] = liveRates ? liveRates[code] : 0;
     }
     fillMissingRates(state);
-    allMonths().forEach(recomputeActuals);
+    allMonths().forEach(recomputeTotals);
     saveState(state);
     document.getElementById('rates-status').textContent = ratesStatusText();
     renderSpending();
@@ -823,7 +897,7 @@ function importStatement(transactions) {
       else addedEarlier += 1;
     }
   });
-  allMonths().forEach(recomputeActuals);
+  allMonths().forEach(recomputeTotals);
   saveState(state);
   renderSpending();
 
@@ -891,7 +965,7 @@ function applyLiveRates(live) {
     if (!state.typedRates.includes(code)) state.rates[code] = live.rates[code];
   });
   fillMissingRates(state);
-  allMonths().forEach(recomputeActuals);
+  allMonths().forEach(recomputeTotals);
   saveState(state);
   renderRates();
   renderSpending();

@@ -68,7 +68,7 @@ test('with a budget-data.csv the browser\'s old copy is not used', async () => {
 
 test('every change is written to the file at once', async () => {
   const app = await openApp({ today: '2026-11-15' });
-  app.type('income-input', '300000');
+  app.addIncome('300000');
   assert.strictEqual(app.saved().income, 300000);
   app.addExpense('food', 90000);
   assert.match(app.csv(), /^entry,2026-11,,,2026-11-15 12:00:00,food,90000,HUF,typed\r$/m);
@@ -93,21 +93,21 @@ test('an unreadable budget-data.csv is copied before it is replaced, and the use
 
 test('if the copy cannot be made, the unreadable file is left as it is', async () => {
   const app = await openApp({ today: '2026-10-15', csv: '{broken', failBackup: true });
-  app.type('income-input', '500');
+  app.addIncome('500');
   assert.strictEqual(app.csv(), '{broken');
   assert.match(app.shown('load-warning'), /left as it is/);
 });
 
 test('without the server the user is told how to start it, and nothing is saved', async () => {
   const app = await openApp({ today: '2026-10-15', server: false });
-  app.type('income-input', '500');
+  app.addIncome('500');
   assert.match(app.shown('load-warning'), /node server\.js/);
   assert.strictEqual(app.csv(), null);
 });
 
 test('a failed save is shown until a later save works', async () => {
   const app = await openApp({ today: '2026-10-15', failSaves: true });
-  app.type('income-input', '500');
+  app.addIncome('500');
   await app.settle();
   assert.match(app.shown('save-warning'), /could not be saved/);
 });

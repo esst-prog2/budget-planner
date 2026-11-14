@@ -122,14 +122,14 @@ test('in the report, only spending over a plan that was set is red', async () =>
 
 test('a past month shows everything entered for it: income, must-pays, plans, spending and what was left', async () => {
   const october = await openApp({ today: '2026-10-20', saved: { month: '2026-10', carryOver: 100 } });
-  october.type('income-input', '1200');
+  october.addIncome('1200');
   october.type('rent-input', '650');
   october.type('phone-input', '20');
   october.type('transport-input', '49');
   october.plan('food', '200');
   october.addExpense('food', 215);
   const app = await openApp({ today: '2026-11-02', csv: october.csv() });
-  app.type('income-input', '900');
+  app.addIncome('900');
   app.showHistoryMonth('2026-10');
   assert.strictEqual(app.shown('history-inputs-title'), 'What you entered for 2026-10');
   const inputs = app.monthInputs();
@@ -145,7 +145,7 @@ test('a past month shows everything entered for it: income, must-pays, plans, sp
 
 test('this month\'s inputs in the history follow what is typed', async () => {
   const app = await openApp({ today: '2026-11-15' });
-  app.type('income-input', '1000');
+  app.addIncome('1000');
   app.plan('food', '300');
   app.addExpense('food', 50);
   assert.strictEqual(app.shown('history-inputs-title'), 'What you entered for 2026-11 (this month)');

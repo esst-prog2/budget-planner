@@ -15,10 +15,24 @@
 
     <section id="income-section">
       <h2>Income</h2>
+      <p class="hint">Add each income of the month in its own currency, e.g. a scholarship in HUF and family aid in MNT.
+        Each is converted to HUF at this month's rate.</p>
       <label class="field">
-        Monthly income
-        <input type="number" id="income-input" min="0" step="0.01" placeholder="0">
+        Name
+        <input type="text" id="income-label" maxlength="40" placeholder="e.g. Scholarship">
       </label>
+      <label class="field">
+        Amount
+        <input type="number" id="income-amount" min="0" step="0.01" placeholder="0">
+      </label>
+      <label class="field">
+        Currency
+        <select id="income-currency"></select>
+      </label>
+      <button id="add-income-btn" type="button">Add income</button>
+      <p id="income-message" class="warning"></p>
+      <div id="income-list"></div>
+      <p class="income-total">Income this month: <span id="income-total">0</span></p>
       <p class="carry-over">Carried over from last month: <span id="carry-over">0</span></p>
     </section>
 

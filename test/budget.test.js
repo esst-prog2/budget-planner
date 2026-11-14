@@ -8,7 +8,7 @@ const assert = require('node:assert');
 const { openApp, categories } = require('../test-support/fake-browser');
 
 function enterReadmeMustPays(app) {
-  app.type('income-input', '1200');
+  app.addIncome('1200');
   app.type('rent-input', '650');
   app.type('phone-input', '20');
   app.type('transport-input', '49');
@@ -46,7 +46,7 @@ test('cents add up exactly: 0.1 + 0.2 + 0.3 against a plan of 0.6 is not over pl
 
 test('negative or non-numeric amounts count as 0', async () => {
   const app = await openApp();
-  app.type('income-input', '-500');
+  app.addIncome('-500');
   app.type('rent-input', 'abc');
   app.plan('food', '-20');
   app.addExpense('food', -30);

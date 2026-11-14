@@ -45,7 +45,7 @@ The page follows one student through one month, in the same order as the README 
 
 **Budget Planner**
 
-For international students in Budapest. Money from home comes in tögrög, euros or dollars; Budapest charges in forints. Every expense is counted in forints at today's rate, and your bank statement is sorted for you.
+For international students in Budapest. Money from home comes in tögrög, euros or dollars; Budapest charges in forints. Every income and expense is counted in forints at today's rate, and your bank statement is sorted for you.
 
 Buttons: **Try it in 2 minutes** (jumps to section 5) · **See a month in it** (jumps to section 3)
 
@@ -57,7 +57,7 @@ Budget Planner does the adding up as you go, in forints, and warns you the momen
 
 ### 3. A month in it (five steps, one screenshot each)
 
-1. **Set up your month.** Type your income and the three must-pays: rent, phone, transport. The app shows what is left to plan right away: *170000 left to plan.* (screenshot 01)
+1. **Set up your month.** Add each income in its own currency, a scholarship in forints or family aid in tögrög, euros or dollars, then the three must-pays: rent, phone, transport. The app shows what is left to plan right away: *170000 left to plan.* (screenshot 01)
 2. **Plan, and get warned.** Give each category a plan. Go over it, and a red warning appears: *Food: 10000 over plan.* (screenshot 02)
 3. **Every currency in forints.** Today's rates for tögrög, euro and dollar are filled in for you. If your bank's rate differs, type your own. Expenses in any of the four currencies are counted in forints. (screenshot 03, retaken after live rates are built)
 4. **Import your bank statement.** Pick the statement .xlsx your bank gives you. The app reads it in your browser, sorts each purchase into Food, Going out or Unknown by the shop's name, puts each month in its own column, and keeps transfers and money in apart from your spending. (screenshots 04 and 06)

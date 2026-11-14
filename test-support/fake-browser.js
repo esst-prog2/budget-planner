@@ -122,6 +122,18 @@ async function openApp({
       input.value = value;
       input.handlers.input();
     },
+    // Adds an income; currency is left as the app set it (HUF) unless given.
+    addIncome(amount, currency, label = '') {
+      byId('income-label').value = label;
+      byId('income-amount').value = String(amount);
+      if (currency) byId('income-currency').value = currency;
+      byId('add-income-btn').handlers.click();
+    },
+    // The income rows of this month as [name, amount, 'Delete'].
+    incomeRows: () => byId('income-list').children.map((row) => row.children.map((cell) => cell.textContent)),
+    deleteIncome(index) {
+      byId('income-list').children[index].children.find((child) => child.className === 'delete-btn').handlers.click();
+    },
     // currency is left as the app set it (HUF) unless given.
     addExpense(category, amount, currency) {
       byId('expense-category').value = category;

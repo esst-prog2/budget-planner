@@ -12,13 +12,13 @@ The app: plain HTML, CSS and JavaScript with a small Node server (`server.js`), 
 
 ## Users
 
-International students in Budapest. Their money arrives in another currency (Mongolian tögrög, euros or dollars: scholarship, family transfers, savings) while rent, food and transport are paid in forints. Their job: know during the month, in forints, how much is left and where it went, instead of adding three currencies up at month end with a googled rate.
+International students in Budapest. Their scholarship comes in forints, while family aid and savings arrive in another currency (Mongolian tögrög, euros or dollars); rent, food and transport are paid in forints. Their job: know during the month, in forints, how much is left and where it went, instead of adding three currencies up at month end with a googled rate.
 
 Also reading the promo page: the course teacher and classmates (Advanced Programming, ELTE, 2026). The page talks to the student.
 
 ## Product Purpose
 
-Budget Planner is a monthly forint budget for one student: income and three must-pays (rent, phone, transport), a plan per category, expenses typed or imported from a bank statement, and a warning the moment a category goes over its plan. Success: the student sees overspending as it happens, not after the money is gone.
+Budget Planner is a monthly forint budget for one student: incomes in their own currencies (a scholarship in forints, family aid in tögrög, euros or dollars), three must-pays (rent, phone, transport), a plan per category, expenses typed or imported from a bank statement, and a warning the moment a category goes over its plan. Success: the student sees overspending as it happens, not after the money is gone.
 
 ## Positioning
 
@@ -33,11 +33,11 @@ Every amount in MNT, EUR or USD is converted to forints at today's rate (fetched
 
 ## Capabilities and Constraints
 
-- Budget in HUF only. Expenses in HUF, MNT, EUR, USD.
+- Budget in HUF. Incomes and expenses in HUF, MNT, EUR, USD, converted at the month's rate.
 - Seven fixed categories: Food, Clothes, Gym, Subscriptions, Going out, Other, Unknown.
 - History of every expense with date and time; current-month entries can be deleted; past months are read-only and show what was entered.
 - Monthly report: one column per month, spending against plan, transfers and money in kept apart, the rate each month used.
-- Not built: custom categories, savings goals, notifications, income or plans in other currencies, historical rates for past months.
+- Not built: custom categories, savings goals, notifications, must-pays or plans in other currencies, historical rates for past months.
 - Privacy: nothing leaves the computer except the rate request; the statement file is never uploaded, only date, category and amount of each purchase are saved.
 
 ## Brand Commitments

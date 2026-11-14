@@ -10,6 +10,8 @@
 //   month,2026-11,income,300000,,,,,  also carryOver, rent, phone, transport, transfers, moneyIn
 //   plan,2026-11,food,80000,,,,,
 //   actual,2026-11,food,90000,,,,,    for reading only; recomputed from the entries on load
+//   income,2026-11,Scholarship,,2026-11-01 09:00:00,,120000,HUF,
+//                                     one row per income; "month,…,income" is their total in HUF
 //   entry,2026-11,,,2026-11-05 12:00:00,food,90000,HUF,typed
 //   imported,2026-11,<statement transaction id>,,,,,,
 
@@ -40,6 +42,9 @@ function stateToCsv(state) {
       row({ type: 'plan', month, key, value: record.categories[key].plan });
       row({ type: 'actual', month, key, value: record.categories[key].actual });
     });
+    (record.incomes || []).forEach((income) => row({
+      type: 'income', month, key: income.label, time: income.time, amount: income.amount, currency: income.currency,
+    }));
     record.entries.forEach((entry) => row({ type: 'entry', month, ...entry }));
     record.importedIds.forEach((id) => row({ type: 'imported', month, key: id }));
   });
@@ -112,6 +117,9 @@ function csvToState(text) {
       record.entries.push({
         time: r.time || null, category: r.category, amount: csvNumber(r.amount), currency: r.currency, source: r.source,
       });
+    } else if (r.type === 'income') {
+      record.incomes = record.incomes || [];
+      record.incomes.push({ time: r.time || null, label: r.key, amount: csvNumber(r.amount), currency: r.currency });
     } else if (r.type === 'imported') {
       record.importedIds.push(r.key);
     } else if (r.type === 'rate') {

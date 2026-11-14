@@ -40,7 +40,7 @@ test('entering the new income keeps the carry-over', async () => {
   const app = await openApp({ today: '2026-10-01', saved: {
     month: '2026-09', carryOver: 0, income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 300 }),
   } });
-  app.type('income-input', '1200');
+  app.addIncome('1200');
   const state = app.saved();
   assert.strictEqual(state.income, 1200);
   assert.strictEqual(state.carryOver, 181);

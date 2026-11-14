@@ -21,7 +21,7 @@ Should users be able to set savings goals? Not this term.
 
 ## The Size
 First version does:
-Enter monthly income (in HUF)
+Enter each income of the month in its own currency (HUF, MNT, EUR or USD), e.g. a scholarship in forints and family aid in tögrög; each is converted to HUF at the month's rate and added up
 Enter fixed must-pay expenses: rent, phone, transport
 Show what's left after must-pays
 Plan amounts for a fixed set of flexible categories (food, clothes, gym, subscriptions, going out, other, unknown)
@@ -35,7 +35,7 @@ Convert expenses in MNT, EUR or USD into HUF with today's exchange rates, fetche
 
 Explicitly not this term:
 
-Income, must-pays and plans in other currencies; historical rates for past months (a month first seen in an imported statement gets the rates of the day it is imported)
+Must-pays and plans in other currencies; counting money in from an imported statement as income (it is listed apart, so nothing is counted twice); historical rates for past months (a month first seen in an imported statement gets the rates of the day it is imported)
 Savings goals
 Custom categories
 Push notifications (a warning shown inside the app is enough for December; phone notifications are a whole project of their own)
@@ -52,7 +52,7 @@ No category: the user puts it in "Other" (custom categories are not built this t
 Income entered twice: 1,200 entered twice on the same day. The app ask if it is correct or not? (backlog, not built yet)
 
 ## Demo
-I start the app with `node server.js --demo` and open http://127.0.0.1:8766: the demo always starts from an empty budget, saved in its own `demo/demo-budget.csv`, so my real `budget-data.csv` is not touched. I type my October numbers: income 300,000 HUF and my rent, phone and transport, 130,000 together, and the screen shows 170000 left to plan. I plan food at 80,000, record a 90,000 grocery shop, and a red warning appears: "Food: 10000 over plan". Under "Exchange rates" today's MNT rate is already filled in, and I import the sample statement, `demo/sample-statement.xlsx`: the app reads 30 transactions, and the Monthly report fills with one column per month from August, tögrög converted to forints and sorted into Food, Going out and Unknown. In History, among the imported purchases, I find the 90,000 shop I typed by hand, delete it, and the Food warning disappears and the report updates at once. The sample statement is made up, in my bank's real format with tögrög amounts from August to November (`node demo/make-sample-statement.js` writes it), so anyone can repeat the demo from a clone; with my real statement only the file name and the number of transactions (215) differ.
+I start the app with `node server.js --demo` and open http://127.0.0.1:8766: the demo always starts from an empty budget, saved in its own `demo/demo-budget.csv`, so my real `budget-data.csv` is not touched. I add my October income, a 300,000 HUF scholarship, and type my rent, phone and transport, 130,000 together, and the screen shows 170000 left to plan. I plan food at 80,000, record a 90,000 grocery shop, and a red warning appears: "Food: 10000 over plan". Under "Exchange rates" today's MNT rate is already filled in, and I import the sample statement, `demo/sample-statement.xlsx`: the app reads 30 transactions, and the Monthly report fills with one column per month from August, tögrög converted to forints and sorted into Food, Going out and Unknown. In History, among the imported purchases, I find the 90,000 shop I typed by hand, delete it, and the Food warning disappears and the report updates at once. The sample statement is made up, in my bank's real format with tögrög amounts from August to November (`node demo/make-sample-statement.js` writes it), so anyone can repeat the demo from a clone; with my real statement only the file name and the number of transactions (215) differ.
 
 ## Run it
 Start the server with `node server.js` (Node.js 18 or newer, no dependencies, no build step) and open http://127.0.0.1:8765. Opening `index.html` directly no longer saves anything. For the demo, `node server.js --demo` (see Demo above).
