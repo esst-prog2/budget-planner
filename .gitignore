@@ -9,3 +9,6 @@ spike/*-private.csv
 
 # The made-up statement for the demo (demo/make-sample-statement.js) is the one exception
 !demo/sample-statement.xlsx
+
+# The demo's own budget (node server.js --demo); it starts empty every time
+demo/demo-budget*.csv

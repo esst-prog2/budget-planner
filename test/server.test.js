@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { createServer } = require('../server');
+const { createServer, serverOptions } = require('../server');
 
 async function startServer() {
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'budget-server-'));
@@ -75,4 +75,12 @@ test('a request for another host name is refused', async (t) => {
     }).on('error', reject);
   });
   assert.strictEqual(status, 403);
+});
+
+test('--demo uses its own file and port, so the real budget is not touched', () => {
+  const normal = serverOptions([]);
+  const demo = serverOptions(['--demo']);
+  assert.deepStrictEqual([normal.port, path.basename(normal.dataFile)], [8765, 'budget-data.csv']);
+  assert.deepStrictEqual([demo.port, path.relative(path.join(__dirname, '..'), demo.dataFile)], [8766, path.join('demo', 'demo-budget.csv')]);
+  assert.strictEqual(serverOptions(['--demo'], { PORT: '9000' }).port, 9000);
 });
