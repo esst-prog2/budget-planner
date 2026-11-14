@@ -1,13 +1,15 @@
-// Shared by the tests: runs the real app.js with a fake localStorage, a fake
-// document, and (optionally) a clock frozen on a chosen day.
+// Shared by the tests: runs the real app.js with a fake server (the CSV file),
+// a fake localStorage, a fake document, and (optionally) a clock frozen on a
+// chosen day.
 
 const fs = require('fs');
 const path = require('path');
+const { csvToState } = require('../csv-data');
 
-// statement.js comes first, as in index.html.
-const APP_SOURCE = ['statement.js', 'app.js']
+// In the order of index.html; `started` lets openApp wait until the budget is loaded.
+const APP_SOURCE = ['statement.js', 'csv-data.js', 'app.js']
   .map((file) => fs.readFileSync(path.join(__dirname, '..', file), 'utf8'))
-  .join('\n');
+  .join('\n') + '\nreturn started;';
 const STORAGE_KEY = 'budgetPlanner:v1';
 const CATEGORY_KEYS = ['food', 'clothes', 'gym', 'subscriptions', 'goingOut', 'other', 'unknown'];
 
@@ -29,15 +31,42 @@ function fakeElement(register) {
   };
 }
 
-// Opens the app with `saved` as the stored data (a string is stored as it is,
-// to fake text that is not valid JSON). `today` (e.g. '2026-10-02') freezes the
-// clock; without it the real date is used.
-function openApp({ today, saved } = {}) {
+function fakeResponse(status, text) {
+  return Promise.resolve({ ok: status >= 200 && status < 300, status, text: async () => text });
+}
+
+// Opens the app; resolves once the saved budget is loaded.
+// - csv: the text of budget-data.csv; without it there is no file yet.
+// - saved: the budget kept in the browser before the CSV file (a string is
+//   stored as it is, to fake text that is not valid JSON).
+// - server: false when the server is not running.
+// - failSaves / failBackup: the server answers saves / the backup with an error.
+// `today` (e.g. '2026-10-02') freezes the clock; without it the real date is used.
+async function openApp({ today, saved, csv, server = true, failSaves = false, failBackup = false } = {}) {
   const store = {};
   if (saved) store[STORAGE_KEY] = typeof saved === 'string' ? saved : JSON.stringify(saved);
   const localStorage = {
     getItem: (key) => (key in store ? store[key] : null),
     setItem: (key, value) => { store[key] = value; },
+  };
+
+  let file = csv === undefined ? null : csv;
+  const backups = [];
+  const fetch = (url, options = {}) => {
+    if (!server) return Promise.reject(new TypeError('Failed to fetch'));
+    const method = options.method || 'GET';
+    if (url === '/api/data' && method === 'GET') return file === null ? fakeResponse(404, '') : fakeResponse(200, file);
+    if (url === '/api/data' && method === 'PUT') {
+      if (failSaves) return fakeResponse(500, '');
+      file = options.body;
+      return fakeResponse(200, 'saved');
+    }
+    if (url === '/api/data/unreadable' && method === 'PUT') {
+      if (failBackup) return fakeResponse(500, '');
+      backups.push(options.body);
+      return fakeResponse(200, 'budget-data.unreadable-20261015-120000.csv');
+    }
+    return fakeResponse(404, '');
   };
 
   const elements = {};
@@ -54,12 +83,21 @@ function openApp({ today, saved } = {}) {
     };
   }
 
-  new Function('localStorage', 'document', 'Date', APP_SOURCE)(localStorage, document, FakeDate);
+  await new Function('localStorage', 'document', 'Date', 'fetch', APP_SOURCE)(localStorage, document, FakeDate, fetch);
+  // Lets the answers to the first saves arrive.
+  await new Promise((resolve) => setImmediate(resolve));
 
   const byId = (id) => document.getElementById(id);
   return {
-    saved: () => JSON.parse(store[STORAGE_KEY]),
-    // Every stored text, by key, to check nothing the user saved went missing.
+    // The budget as read back from budget-data.csv.
+    saved: () => csvToState(file),
+    // The text of budget-data.csv; null while there is none.
+    csv: () => file,
+    // Copies of unreadable files the server was asked to keep.
+    backups: () => [...backups],
+    // Lets the answers to the saves so far arrive.
+    settle: () => new Promise((resolve) => setImmediate(resolve)),
+    // Every text stored in the browser, by key, to check nothing the user saved went missing.
     storedAll: () => ({ ...store }),
     shown: (id) => byId(id).textContent,
     type: (id, value) => byId(id).handlers.input({ target: { value } }),
