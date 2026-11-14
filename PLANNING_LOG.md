@@ -87,3 +87,4 @@
 2026-11-14 — The README demo starts the app with `node server.js --demo` instead of opening index.html, since only the server saves data now — decided by: user
 2026-11-14 — `--demo` uses its own file, demo/demo-budget.csv (ignored by Git), deleted at every start so the demo begins empty, and its own address, 127.0.0.1:8766, so neither my real budget-data.csv nor the old browser data of 8765 is read or changed — decided by: agent
 2026-11-14 — After each step: commit, and add a row to PROCESS.md (step, what the tool did, what I decided); the rule is in AGENTS.md — decided by: user
+2026-11-14 — The promo page goes in docs/ and GitHub Pages publishes only that folder, so budget-data.csv, the app and the logs are not on the site; the page uses copies of the demo screenshots (sample data only) — decided by: user
