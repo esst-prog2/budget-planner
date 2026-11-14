@@ -21,8 +21,8 @@ const STATEMENT = makeXlsx([
   tx('2026-11-05 10:00:00', 2000, 0, 'tsalin'),
 ]);
 
-test('a typed expense in EUR is converted to HUF and keeps its own amount', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('a typed expense in EUR is converted to HUF and keeps its own amount', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('EUR', '400');
   app.plan('food', '5000');
   app.addExpense('food', 10, 'EUR');
@@ -34,8 +34,8 @@ test('a typed expense in EUR is converted to HUF and keeps its own amount', () =
     { time: '2026-11-15 12:00:00', category: 'food', amount: 10, currency: 'EUR', source: 'typed' });
 });
 
-test('changing a rate re-converts every month, past months too', () => {
-  const app = openApp({ today: '2026-11-15', saved: {
+test('changing a rate re-converts every month, past months too', async () => {
+  const app = await openApp({ today: '2026-11-15', saved: {
     month: '2026-11', categories: categories(), rates: { EUR: 400 },
     entries: [{ time: '2026-11-03 09:00:00', category: 'food', amount: 10, currency: 'EUR', source: 'typed' }],
     pastMonths: [{ month: '2026-10', categories: categories(),
@@ -53,7 +53,7 @@ test('changing a rate re-converts every month, past months too', () => {
 });
 
 test('statement amounts are converted from MNT, including transfers and money in', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '0.1');
   await app.importFile(STATEMENT);
   const row = (label) => app.reportRows().find((r) => r[0] === label);
@@ -67,7 +67,7 @@ test('statement amounts are converted from MNT, including transfers and money in
 });
 
 test('without a rate, imported amounts are not lost: they wait, with a warning, until the rate is typed', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   await app.importFile(STATEMENT);
   assert.strictEqual(app.saved().categories.food.actual, 0);
   assert.strictEqual(app.shown('rate-warning'),
@@ -79,27 +79,27 @@ test('without a rate, imported amounts are not lost: they wait, with a warning, 
   assert.strictEqual(app.shown('rate-warning'), '');
 });
 
-test('an expense in a currency with no rate is not added, and the user is told why', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('an expense in a currency with no rate is not added, and the user is told why', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   app.addExpense('food', 20, 'USD');
   assert.deepStrictEqual(app.saved().entries, []);
   assert.strictEqual(app.shown('expense-message'),
     'Enter the USD rate under "Exchange rates" first; the expense was not added.');
 });
 
-test('a rate keeps all its decimals and is saved for the next visit', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('a rate keeps all its decimals and is saved for the next visit', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '0.1087');
   app.addExpense('food', 1000, 'MNT');
   // 1000 x 0.1087 = 108.7, not 1000 x 0.11 = 110.
   assert.strictEqual(app.saved().categories.food.actual, 108.7);
-  const again = openApp({ today: '2026-11-15', saved: app.saved() });
+  const again = await openApp({ today: '2026-11-15', saved: app.saved() });
   assert.strictEqual(again.saved().rates.MNT, 0.1087);
   assert.strictEqual(again.saved().categories.food.actual, 108.7);
 });
 
-test('saved before currencies existed: statement entries were MNT, everything else HUF', () => {
-  const app = openApp({ today: '2026-11-15', saved: {
+test('saved before currencies existed: statement entries were MNT, everything else HUF', async () => {
+  const app = await openApp({ today: '2026-11-15', saved: {
     month: '2026-11', categories: categories(), rates: { MNT: 0.1 },
     entries: [
       { time: '2026-11-02 10:00:00', category: 'food', amount: 1000, source: 'statement' },

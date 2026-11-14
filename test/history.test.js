@@ -9,8 +9,8 @@ const { openApp, categories } = require('../test-support/fake-browser');
 
 const MUST_PAYS = { rent: 650, phone: 20, transport: 49 }; // 719 in total
 
-test('a typed expense is saved with its time, category, amount and source, newest first', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('a typed expense is saved with its time, category, amount and source, newest first', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   app.addExpense('food', 25);
   app.addExpense('goingOut', 12.5);
   assert.deepStrictEqual(app.historyRows(), [
@@ -23,8 +23,8 @@ test('a typed expense is saved with its time, category, amount and source, newes
   ]);
 });
 
-test('deleting an entry recalculates the totals, the warning and the report', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('deleting an entry recalculates the totals, the warning and the report', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   app.plan('food', '200');
   app.addExpense('food', 190);
   app.addExpense('food', 25);
@@ -42,8 +42,8 @@ test('deleting an entry recalculates the totals, the warning and the report', ()
   assert.deepStrictEqual(app.historyRows(), [['2026-11-15 12:00:00', 'Food', '190', 'typed', 'Delete']]);
 });
 
-test('at the month change the finished month is kept and can be looked at, but not changed', () => {
-  const app = openApp({ today: '2026-11-02', saved: {
+test('at the month change the finished month is kept and can be looked at, but not changed', async () => {
+  const app = await openApp({ today: '2026-11-02', saved: {
     month: '2026-10', carryOver: 0, income: 1200, mustPays: MUST_PAYS, categories: categories(),
     entries: [
       { time: '2026-10-03 09:00:00', category: 'food', amount: 200, source: 'typed' },
@@ -72,8 +72,8 @@ test('at the month change the finished month is kept and can be looked at, but n
   assert.deepStrictEqual(row('Must-pays'), ['Must-pays', '719', '0']);
 });
 
-test('past months pile up in order, one per month change', () => {
-  const app = openApp({ today: '2026-12-01', saved: {
+test('past months pile up in order, one per month change', async () => {
+  const app = await openApp({ today: '2026-12-01', saved: {
     month: '2026-11', income: 500, categories: categories({ food: 50 }),
     pastMonths: [{ month: '2026-10', income: 400, categories: categories({ gym: 30 }) }],
   } });
@@ -81,8 +81,8 @@ test('past months pile up in order, one per month change', () => {
   assert.deepStrictEqual(app.reportRows()[0], ['', '2026-10', '2026-11', '2026-12']);
 });
 
-test('spending saved before the history existed shows as one deletable entry per category', () => {
-  const app = openApp({ today: '2026-11-15', saved: {
+test('spending saved before the history existed shows as one deletable entry per category', async () => {
+  const app = await openApp({ today: '2026-11-15', saved: {
     month: '2026-11', income: 1200, categories: categories({ food: 40, gym: 15 }),
   } });
   assert.deepStrictEqual(app.historyRows(), [
@@ -94,8 +94,8 @@ test('spending saved before the history existed shows as one deletable entry per
   assert.strictEqual(app.saved().categories.food.actual, 40);
 });
 
-test('an old month saved before the history existed keeps its totals after the month change', () => {
-  const app = openApp({ today: '2026-11-02', saved: {
+test('an old month saved before the history existed keeps its totals after the month change', async () => {
+  const app = await openApp({ today: '2026-11-02', saved: {
     month: '2026-10', income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 300 }),
   } });
   const october = app.saved().pastMonths[0];
@@ -104,18 +104,53 @@ test('an old month saved before the history existed keeps its totals after the m
   assert.strictEqual(app.saved().carryOver, 181);
 });
 
-test('a month with nothing recorded says so', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('a month with nothing recorded says so', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   assert.deepStrictEqual(app.historyRows(), []);
   assert.deepStrictEqual(app.historyNotes(), ['No expenses recorded in this month.']);
 });
 
-test('in the report, only spending over a plan that was set is red', () => {
-  const app = openApp({ today: '2026-11-15' });
+test('in the report, only spending over a plan that was set is red', async () => {
+  const app = await openApp({ today: '2026-11-15' });
   app.plan('food', '100');
   app.addExpense('food', 150);
   app.addExpense('gym', 30); // no gym plan
   const classOf = (label) => app.reportClasses()[app.reportRows().findIndex((r) => r[0] === label)][1];
   assert.strictEqual(classOf('Food'), 'over');
   assert.strictEqual(classOf('Gym'), '');
+});
+
+test('a past month shows everything entered for it: income, must-pays, plans, spending and what was left', async () => {
+  const october = await openApp({ today: '2026-10-20', saved: { month: '2026-10', carryOver: 100 } });
+  october.type('income-input', '1200');
+  october.type('rent-input', '650');
+  october.type('phone-input', '20');
+  october.type('transport-input', '49');
+  october.plan('food', '200');
+  october.addExpense('food', 215);
+  const app = await openApp({ today: '2026-11-02', csv: october.csv() });
+  app.type('income-input', '900');
+  app.showHistoryMonth('2026-10');
+  assert.strictEqual(app.shown('history-inputs-title'), 'What you entered for 2026-10');
+  const inputs = app.monthInputs();
+  assert.strictEqual(inputs['Carried over'], '100');
+  assert.strictEqual(inputs.Income, '1200');
+  assert.deepStrictEqual([inputs.Rent, inputs.Phone, inputs.Transport], ['650', '20', '49']);
+  assert.strictEqual(inputs['Left to plan'], '581');
+  assert.strictEqual(inputs['Food (spent / plan)'], '215 / 200');
+  assert.strictEqual(inputs['Gym (spent / plan)'], '0');
+  assert.strictEqual(inputs.Spending, '215 / 200');
+  assert.strictEqual(inputs['Left at month end'], '366');
+});
+
+test('this month\'s inputs in the history follow what is typed', async () => {
+  const app = await openApp({ today: '2026-11-15' });
+  app.type('income-input', '1000');
+  app.plan('food', '300');
+  app.addExpense('food', 50);
+  assert.strictEqual(app.shown('history-inputs-title'), 'What you entered for 2026-11 (this month)');
+  const inputs = app.monthInputs();
+  assert.strictEqual(inputs.Income, '1000');
+  assert.strictEqual(inputs['Food (spent / plan)'], '50 / 300');
+  assert.strictEqual(inputs['Left so far'], '950');
 });

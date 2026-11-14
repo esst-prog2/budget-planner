@@ -9,8 +9,8 @@ const { openApp, categories } = require('../test-support/fake-browser');
 
 const MUST_PAYS = { rent: 650, phone: 20, transport: 49 }; // 719 in total
 
-test('same month: nothing is reset', () => {
-  const app = openApp({ today: '2026-10-15', saved: {
+test('same month: nothing is reset', async () => {
+  const app = await openApp({ today: '2026-10-15', saved: {
     month: '2026-10', carryOver: 50, income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 10 }),
   } });
   const state = app.saved();
@@ -21,8 +21,8 @@ test('same month: nothing is reset', () => {
   assert.strictEqual(state.categories.food.actual, 10);
 });
 
-test('new month: leftover becomes the carry-over and everything else is empty', () => {
-  const app = openApp({ today: '2026-10-01', saved: {
+test('new month: leftover becomes the carry-over and everything else is empty', async () => {
+  const app = await openApp({ today: '2026-10-01', saved: {
     month: '2026-09', carryOver: 0, income: 1200, mustPays: MUST_PAYS,
     categories: categories({ food: 200, goingOut: 100 }),
   } });
@@ -36,8 +36,8 @@ test('new month: leftover becomes the carry-over and everything else is empty', 
   assert.strictEqual(app.shown('carry-over'), '181');
 });
 
-test('entering the new income keeps the carry-over', () => {
-  const app = openApp({ today: '2026-10-01', saved: {
+test('entering the new income keeps the carry-over', async () => {
+  const app = await openApp({ today: '2026-10-01', saved: {
     month: '2026-09', carryOver: 0, income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 300 }),
   } });
   app.type('income-input', '1200');
@@ -47,16 +47,16 @@ test('entering the new income keeps the carry-over', () => {
   assert.strictEqual(app.shown('left-to-plan'), '1381');
 });
 
-test('carry-over keeps rolling forward across months', () => {
-  const app = openApp({ today: '2026-10-01', saved: {
+test('carry-over keeps rolling forward across months', async () => {
+  const app = await openApp({ today: '2026-10-01', saved: {
     month: '2026-09', carryOver: 181, income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 300 }),
   } });
   // 181 + 1200 - 719 - 300 = 362
   assert.strictEqual(app.saved().carryOver, 362);
 });
 
-test('overspending carries over as a negative amount, not clamped at zero', () => {
-  const app = openApp({ today: '2026-10-01', saved: {
+test('overspending carries over as a negative amount, not clamped at zero', async () => {
+  const app = await openApp({ today: '2026-10-01', saved: {
     month: '2026-09', carryOver: 0, income: 500, mustPays: MUST_PAYS, categories: categories({ food: 100 }),
   } });
   // 500 - 719 - 100 = -319
@@ -64,8 +64,8 @@ test('overspending carries over as a negative amount, not clamped at zero', () =
   assert.strictEqual(app.shown('left-to-plan'), '-319');
 });
 
-test('skipped months: one leftover from the last saved month, then jump to today', () => {
-  const app = openApp({ today: '2026-12-05', saved: {
+test('skipped months: one leftover from the last saved month, then jump to today', async () => {
+  const app = await openApp({ today: '2026-12-05', saved: {
     month: '2026-09', carryOver: 0, income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 300 }),
   } });
   const state = app.saved();
@@ -73,8 +73,8 @@ test('skipped months: one leftover from the last saved month, then jump to today
   assert.strictEqual(state.carryOver, 181);
 });
 
-test('year change: December rolls into January', () => {
-  const app = openApp({ today: '2027-01-01', saved: {
+test('year change: December rolls into January', async () => {
+  const app = await openApp({ today: '2027-01-01', saved: {
     month: '2026-12', carryOver: 0, income: 1000, mustPays: MUST_PAYS, categories: categories(),
   } });
   const state = app.saved();
@@ -82,8 +82,8 @@ test('year change: December rolls into January', () => {
   assert.strictEqual(state.carryOver, 281);
 });
 
-test('data saved before the carry-over existed still rolls over', () => {
-  const app = openApp({ today: '2026-10-01', saved: {
+test('data saved before the carry-over existed still rolls over', async () => {
+  const app = await openApp({ today: '2026-10-01', saved: {
     month: '2026-09', income: 1200, mustPays: MUST_PAYS, categories: categories({ food: 300 }),
   } });
   assert.strictEqual(app.saved().carryOver, 181);

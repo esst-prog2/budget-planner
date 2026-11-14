@@ -10,6 +10,7 @@
   <div class="app">
     <h1>Budget Planner</h1>
     <p id="load-warning" class="warning" hidden></p>
+    <p id="save-warning" class="warning" hidden></p>
     <p class="month-label">Month: <span id="current-month"></span></p>
 
     <section id="income-section">
@@ -91,6 +92,9 @@
         Month
         <select id="history-month"></select>
       </label>
+      <h3 id="history-inputs-title" class="history-subtitle"></h3>
+      <table id="history-inputs" class="report-table"></table>
+      <h3 class="history-subtitle">Expenses</h3>
       <div id="history-list"></div>
     </section>
 
@@ -98,13 +102,13 @@
       <h2>Monthly report</h2>
       <p class="hint">Actual spending / plan for every saved month, typed and imported. Red is over a plan you set.</p>
       <div class="report-scroll">
-        <table id="monthly-report"></table>
+        <table id="monthly-report" class="report-table"></table>
       </div>
     </section>
 
     <section id="statement-section">
       <h2>Import a bank statement</h2>
-      <p class="hint">Pick your deposit statement (.xlsx). It is read in this browser only; nothing is uploaded.
+      <p class="hint">Pick your deposit statement (.xlsx). The file is read in this browser; only the date, category and amount of each purchase are saved, in budget-data.csv.
         Each purchase is saved in the history of its month; only this month's change the budget above.</p>
       <label class="field">
         Statement
@@ -115,6 +119,7 @@
   </div>
 
   <script src="statement.js"></script>
+  <script src="csv-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

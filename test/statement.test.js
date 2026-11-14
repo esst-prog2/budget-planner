@@ -42,7 +42,7 @@ test('reads every dated row of the statement and skips the title and total rows'
   assert.strictEqual(sum('moneyOut'), 650.75);
 });
 
-test('shop names pick the category; a shop that is not recognised is Unknown', () => {
+test('shop names pick the category; a shop that is not recognised is Unknown', async () => {
   assert.strictEqual(categoryFor('CB - POS Purchase CBA GO:RO:G CSEMEGE.BUDAPEST'), 'food');
   assert.strictEqual(categoryFor('P10 - Purchase CBAPRIMACORVIN - CBA PRI\'MA CORVIN'), 'food');
   assert.strictEqual(categoryFor('P10 - Purchase 3 - DECATHLON NYUGATI TE\'R'), 'clothes');
@@ -52,13 +52,13 @@ test('shop names pick the category; a shop that is not recognised is Unknown', (
   assert.strictEqual(categoryFor('13148888:POS Normal Purchase'), 'unknown');
 });
 
-test('bank fees are known, so they go to Other, not Unknown', () => {
+test('bank fees are known, so they go to Other, not Unknown', async () => {
   const fee = { moneyIn: 0, moneyOut: 100, description: 'EB -И-БАНК ГҮЙЛГЭЭНИЙ ШИМТГЭЛ' };
   assert.deepStrictEqual(sortTransaction(fee), { kind: 'spending', category: 'other' });
 });
 
 test('import adds this month\'s purchases and fees to the budget, earlier ones to the history', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '1');
   app.plan('food', '100');
   app.plan('clothes', '50');
@@ -85,7 +85,7 @@ test('import adds this month\'s purchases and fees to the budget, earlier ones t
 });
 
 test('report per month: spending by category, transfers and money in kept apart', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '1');
   await app.importFile(STATEMENT);
   const rows = app.reportRows();
@@ -103,7 +103,7 @@ test('report per month: spending by category, transfers and money in kept apart'
 });
 
 test('importing the same statement twice does not count it twice', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '1');
   await app.importFile(STATEMENT);
   await app.importFile(STATEMENT);
@@ -115,7 +115,7 @@ test('importing the same statement twice does not count it twice', async () => {
 });
 
 test('a deleted statement purchase does not come back when the statement is imported again', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '1');
   await app.importFile(STATEMENT);
   // Newest first: the top row is the 25 Decathlon purchase of 2026-11-04.
@@ -126,14 +126,14 @@ test('a deleted statement purchase does not come back when the statement is impo
 });
 
 test('the report is kept for the next visit', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   await app.importFile(STATEMENT);
-  const again = openApp({ today: '2026-11-15', saved: app.saved() });
+  const again = await openApp({ today: '2026-11-15', saved: app.saved() });
   assert.deepStrictEqual(again.reportRows(), app.reportRows());
 });
 
 test('a file that is not a statement changes nothing and says so', async () => {
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.addExpense('food', 10);
   await app.importFile(Buffer.from('not a spreadsheet'));
   assert.strictEqual(app.saved().categories.food.actual, 10);
@@ -148,7 +148,7 @@ test('two identical fees in the same second are two charges, not one', async () 
     tx('2026-11-06 09:00:00', 0, 100, 'EB -И-БАНК ГҮЙЛГЭЭНИЙ ШИМТГЭЛ'),
     tx('2026-11-06 09:00:00', 0, 100, 'EB -И-БАНК ГҮЙЛГЭЭНИЙ ШИМТГЭЛ'),
   ]);
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '1');
   await app.importFile(twoFees);
   assert.strictEqual(app.saved().categories.other.actual, 200);
@@ -159,7 +159,7 @@ test('two identical fees in the same second are two charges, not one', async () 
 
 test('a statement with only new money in says what it added, not "Nothing new"', async () => {
   const salaryOnly = makeXlsx([HEADER, tx('2026-11-10 09:00:00', 700, 0, 'tsalin')]);
-  const app = openApp({ today: '2026-11-15' });
+  const app = await openApp({ today: '2026-11-15' });
   app.setRate('MNT', '1');
   await app.importFile(salaryOnly);
   assert.strictEqual(app.saved().moneyIn, 700);
