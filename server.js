@@ -1,6 +1,11 @@
 // Serves the app and keeps the budget in budget-data.csv: `node server.js`,
 // then open http://127.0.0.1:8765. No dependencies; Node.js 18 or newer.
 //
+// `node server.js --demo` starts an empty budget for the demo instead, in
+// demo/demo-budget.csv on http://127.0.0.1:8766: a separate file and a
+// separate address, so neither budget-data.csv nor the budget kept in the
+// browser for 8765 is read or changed.
+//
 //   GET  /api/data             the CSV file, or 404 while there is none
 //   PUT  /api/data             replaces it with the request body
 //   PUT  /api/data/unreadable  keeps a copy of a file the app could not read
@@ -9,7 +14,6 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = Number(process.env.PORT) || 8765;
 // Only this computer can reach the server, so nobody else can read the budget.
 const HOST = '127.0.0.1';
 const MAX_BODY = 10 * 1024 * 1024;
@@ -105,10 +109,24 @@ function createServer({ root = __dirname, dataFile = path.join(__dirname, 'budge
   });
 }
 
+// Where the budget is kept and which port to use, from the command line.
+function serverOptions(args, env = {}) {
+  const demo = args.includes('--demo');
+  return {
+    demo,
+    port: Number(env.PORT) || (demo ? 8766 : 8765),
+    dataFile: demo ? path.join(__dirname, 'demo', 'demo-budget.csv') : path.join(__dirname, 'budget-data.csv'),
+  };
+}
+
 if (require.main === module) {
-  createServer().listen(PORT, HOST, () => {
-    console.log(`Budget Planner: http://${HOST}:${PORT}  (data in budget-data.csv; Ctrl+C to stop)`);
+  const { demo, port, dataFile } = serverOptions(process.argv.slice(2), process.env);
+  // The demo starts from an empty budget every time.
+  if (demo) fs.rmSync(dataFile, { force: true });
+  createServer({ dataFile }).listen(port, HOST, () => {
+    const what = demo ? 'demo, starting empty' : 'your budget';
+    console.log(`Budget Planner: http://${HOST}:${port}  (${what}, saved in ${path.relative(__dirname, dataFile)}; Ctrl+C to stop)`);
   });
 }
 
-module.exports = { createServer };
+module.exports = { createServer, serverOptions };
