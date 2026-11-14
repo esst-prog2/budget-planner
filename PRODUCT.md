@@ -12,13 +12,13 @@ The app: plain HTML, CSS and JavaScript with a small Node server (`server.js`), 
 
 ## Users
 
-International students in Budapest. Their scholarship comes in forints, while family aid and savings arrive in another currency (Mongolian tögrög, euros or dollars); rent, food and transport are paid in forints. Their job: know during the month, in forints, how much is left and where it went, instead of adding three currencies up at month end with a googled rate.
+International students in Budapest. Their scholarship or part-time salary comes in forints, while family aid and savings arrive in another currency (Mongolian tögrög, euros or dollars); rent, food and transport are paid in forints. Their job: know during the month, in forints, how much is left and where it went, instead of adding three currencies up at month end with a googled rate.
 
 Also reading the promo page: the course teacher and classmates (Advanced Programming, ELTE, 2026). The page talks to the student.
 
 ## Product Purpose
 
-Budget Planner is a monthly forint budget for one student: incomes in their own currencies (a scholarship in forints, family aid in tögrög, euros or dollars), three must-pays (rent, phone, transport), a plan per category, expenses typed or imported from a bank statement, and a warning the moment a category goes over its plan. Success: the student sees overspending as it happens, not after the money is gone.
+Budget Planner is a monthly forint budget for one student: incomes in their own currencies (a scholarship or salary in forints, family aid in tögrög, euros or dollars), three must-pays (rent, phone, transport), a plan per category, expenses typed or imported from a bank statement, and a warning the moment a category goes over its plan. Success: the student sees overspending as it happens, not after the money is gone.
 
 ## Positioning
 

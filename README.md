@@ -21,7 +21,7 @@ Should users be able to set savings goals? Not this term.
 
 ## The Size
 First version does:
-Enter each income of the month in its own currency (HUF, MNT, EUR or USD), e.g. a scholarship in forints and family aid in tögrög; each is converted to HUF at the month's rate and added up
+Enter each income of the month in its own currency (HUF, MNT, EUR or USD), e.g. a scholarship or salary in forints and family aid in tögrög; each is converted to HUF at the month's rate and added up
 Enter fixed must-pay expenses: rent, phone, transport
 Show what's left after must-pays
 Plan amounts for a fixed set of flexible categories (food, clothes, gym, subscriptions, going out, other, unknown)
