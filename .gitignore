@@ -3,3 +3,5 @@ spike/*-private.csv
 
 # Real bank statements stay local; tests build their own fake .xlsx files
 *.xlsx
+# The made-up statement for the demo (demo/make-sample-statement.js) is the one exception
+!demo/sample-statement.xlsx
