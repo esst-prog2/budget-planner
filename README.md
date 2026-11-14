@@ -16,7 +16,7 @@ Answered so far (details in PLANNING_LOG.md):
 Should the budget reset automatically every month? Yes, and the leftover is carried over to the next month.
 Should users be able to create their own expense categories? Not this term; seven fixed categories (the seventh, Unknown, holds imported purchases whose shop is not recognised).
 What is the simplest way to display spending so that it is easy to understand? Plan vs. actual with a progress bar per category.
-Should the application support multiple currencies? Partly: the budget is in HUF, and expenses in MNT, EUR or USD are converted with rates the user types in.
+Should the application support multiple currencies? Partly: the budget is in HUF, and expenses in MNT, EUR or USD are converted with today's rates, fetched online (the user can type their own). Each month keeps its own rates.
 Should users be able to set savings goals? Not this term.
 
 ## The Size
@@ -31,11 +31,11 @@ Start a fresh month (automatically)
 Import a bank deposit statement (.xlsx); each purchase is saved in the history of its month, and this month's purchases and fees are added to the actual spending
 Keep a history of every expense (typed or imported) with date and time; a wrong entry can be deleted
 Keep every finished month and show one monthly report: actual / plan per category, income and must-pays
-Convert expenses in MNT, EUR or USD into HUF with exchange rates the user types; the bank statement's MNT amounts are converted too
+Convert expenses in MNT, EUR or USD into HUF with today's exchange rates, fetched when the app opens (open.er-api.com, free, no key; only the code HUF is sent) or typed by the user; the bank statement's MNT amounts are converted too. A finished month keeps the rates it ended with; offline, the last rates saved are used
 
 Explicitly not this term:
 
-Income, must-pays and plans in other currencies; fetching exchange rates online
+Income, must-pays and plans in other currencies; historical rates for past months (a month first seen in an imported statement gets the rates of the day it is imported)
 Savings goals
 Custom categories
 Push notifications (a warning shown inside the app is enough for December; phone notifications are a whole project of their own)
@@ -52,7 +52,7 @@ No category: the user puts it in "Other" (custom categories are not built this t
 Income entered twice: 1,200 entered twice on the same day. The app ask if it is correct or not? (backlog, not built yet)
 
 ## Demo
-I start the app with `node server.js --demo` and open http://127.0.0.1:8766: the demo always starts from an empty budget, saved in its own `demo/demo-budget.csv`, so my real `budget-data.csv` is not touched. I type my October numbers: income 300,000 HUF and my rent, phone and transport, 130,000 together, and the screen shows 170000 left to plan. I plan food at 80,000, record a 90,000 grocery shop, and a red warning appears: "Food: 10000 over plan". Under "Exchange rates" I type today's MNT rate and import the sample statement, `demo/sample-statement.xlsx`: the app reads 30 transactions, and the Monthly report fills with one column per month from August, tögrög converted to forints and sorted into Food, Going out and Unknown. In History, among the imported purchases, I find the 90,000 shop I typed by hand, delete it, and the Food warning disappears and the report updates at once. The sample statement is made up, in my bank's real format with tögrög amounts from August to November (`node demo/make-sample-statement.js` writes it), so anyone can repeat the demo from a clone; with my real statement only the file name and the number of transactions (215) differ.
+I start the app with `node server.js --demo` and open http://127.0.0.1:8766: the demo always starts from an empty budget, saved in its own `demo/demo-budget.csv`, so my real `budget-data.csv` is not touched. I type my October numbers: income 300,000 HUF and my rent, phone and transport, 130,000 together, and the screen shows 170000 left to plan. I plan food at 80,000, record a 90,000 grocery shop, and a red warning appears: "Food: 10000 over plan". Under "Exchange rates" today's MNT rate is already filled in, and I import the sample statement, `demo/sample-statement.xlsx`: the app reads 30 transactions, and the Monthly report fills with one column per month from August, tögrög converted to forints and sorted into Food, Going out and Unknown. In History, among the imported purchases, I find the 90,000 shop I typed by hand, delete it, and the Food warning disappears and the report updates at once. The sample statement is made up, in my bank's real format with tögrög amounts from August to November (`node demo/make-sample-statement.js` writes it), so anyone can repeat the demo from a clone; with my real statement only the file name and the number of transactions (215) differ.
 
 ## Run it
 Start the server with `node server.js` (Node.js 18 or newer, no dependencies, no build step) and open http://127.0.0.1:8765. Opening `index.html` directly no longer saves anything. For the demo, `node server.js --demo` (see Demo above).

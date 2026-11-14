@@ -32,7 +32,9 @@ function fakeElement(register) {
 }
 
 function fakeResponse(status, text) {
-  return Promise.resolve({ ok: status >= 200 && status < 300, status, text: async () => text });
+  return Promise.resolve({
+    ok: status >= 200 && status < 300, status, text: async () => text, json: async () => JSON.parse(text),
+  });
 }
 
 // Opens the app; resolves once the saved budget is loaded.
@@ -41,8 +43,13 @@ function fakeResponse(status, text) {
 //   stored as it is, to fake text that is not valid JSON).
 // - server: false when the server is not running.
 // - failSaves / failBackup: the server answers saves / the backup with an error.
+// - liveRates: today's rates online, e.g. { MNT: 0.1, EUR: 400, USD: 360 } in
+//   HUF, with liveRatesDay ('2026-11-14'); without them the rates cannot be
+//   fetched, as offline.
 // `today` (e.g. '2026-10-02') freezes the clock; without it the real date is used.
-async function openApp({ today, saved, csv, server = true, failSaves = false, failBackup = false } = {}) {
+async function openApp({
+  today, saved, csv, server = true, failSaves = false, failBackup = false, liveRates, liveRatesDay = '2026-11-14',
+} = {}) {
   const store = {};
   if (saved) store[STORAGE_KEY] = typeof saved === 'string' ? saved : JSON.stringify(saved);
   const localStorage = {
@@ -53,6 +60,15 @@ async function openApp({ today, saved, csv, server = true, failSaves = false, fa
   let file = csv === undefined ? null : csv;
   const backups = [];
   const fetch = (url, options = {}) => {
+    // Only the exact address answers, so a request carrying anything more fails.
+    if (url === 'https://open.er-api.com/v6/latest/HUF') {
+      if (!liveRates) return Promise.reject(new TypeError('Failed to fetch'));
+      // The service answers in units per forint.
+      const rates = { HUF: 1 };
+      Object.entries(liveRates).forEach(([code, huf]) => { rates[code] = 1 / huf; });
+      const unix = Date.parse(`${liveRatesDay}T00:02:31Z`) / 1000;
+      return fakeResponse(200, JSON.stringify({ result: 'success', base_code: 'HUF', time_last_update_unix: unix, rates }));
+    }
     if (!server) return Promise.reject(new TypeError('Failed to fetch'));
     const method = options.method || 'GET';
     if (url === '/api/data' && method === 'GET') return file === null ? fakeResponse(404, '') : fakeResponse(200, file);

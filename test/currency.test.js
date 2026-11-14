@@ -1,7 +1,8 @@
 // Currency tests: run with `node --test` from the project root.
 //
-// The budget is in HUF. Rates are typed by the user as "1 <currency> = x HUF"
-// and always the current rate is used, so changing one updates every month.
+// The budget is in HUF. Rates are "1 <currency> = x HUF", one set per month:
+// this month's are fetched online or typed, a finished month keeps its own.
+// Live rates are tested in live-rates.test.js; here the rates are typed.
 
 const test = require('node:test');
 const assert = require('node:assert');
@@ -34,7 +35,7 @@ test('a typed expense in EUR is converted to HUF and keeps its own amount', asyn
     { time: '2026-11-15 12:00:00', category: 'food', amount: 10, currency: 'EUR', source: 'typed' });
 });
 
-test('changing a rate re-converts every month, past months too', async () => {
+test('changing a rate re-converts this month only; a finished month keeps its rate', async () => {
   const app = await openApp({ today: '2026-11-15', saved: {
     month: '2026-11', categories: categories(), rates: { EUR: 400 },
     entries: [{ time: '2026-11-03 09:00:00', category: 'food', amount: 10, currency: 'EUR', source: 'typed' }],
@@ -46,10 +47,11 @@ test('changing a rate re-converts every month, past months too', async () => {
   assert.deepStrictEqual(row('Gym'), ['Gym', '8000', '0']);
 
   app.setRate('EUR', '410');
-  // 10 x 410 = 4100 and 20 x 410 = 8200.
+  // 10 x 410 = 4100 this month; October keeps 400, so 20 x 400 = 8000.
   assert.strictEqual(app.saved().categories.food.actual, 4100);
   assert.deepStrictEqual(row('Food'), ['Food', '0', '4100']);
-  assert.deepStrictEqual(row('Gym'), ['Gym', '8200', '0']);
+  assert.deepStrictEqual(row('Gym'), ['Gym', '8000', '0']);
+  assert.deepStrictEqual(row('1 EUR in HUF'), ['1 EUR in HUF', '400', '410']);
 });
 
 test('statement amounts are converted from MNT, including transfers and money in', async () => {

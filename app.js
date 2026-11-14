@@ -73,13 +73,21 @@ function makeEmptyMonth(month) {
     // money in. Shown in the report, not counted as spending.
     transfers: 0,
     moneyIn: 0,
+    // HUF for one unit of each other currency, 0 while unknown. Each month has
+    // its own: this month follows today's rates, a finished month keeps the
+    // rates it ended with, so its totals do not change afterwards.
+    rates: { MNT: 0, EUR: 0, USD: 0 },
   };
 }
 
 function makeEmptyState(month) {
-  // rates: HUF for one unit of each other currency; 0 until the user types it.
-  return { ...makeEmptyMonth(month), pastMonths: [], rates: { MNT: 0, EUR: 0, USD: 0 } };
+  // typedRates: this month's currencies whose rate the user typed; those are
+  // not replaced by today's rates. ratesDate: the day of the last rates fetched.
+  return { ...makeEmptyMonth(month), pastMonths: [], typedRates: [], ratesDate: '' };
 }
+
+// The currencies that need a rate.
+const RATE_CODES = CURRENCIES.filter((code) => code !== BASE_CURRENCY);
 
 // Reads a rate the user typed; unlike money it is not rounded to cents
 // (1 MNT is about a tenth of a forint).
@@ -112,11 +120,11 @@ function numberOr(value, fallback) {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-// Each category's actual spending in HUF: the sum of its entries at today's rates.
-function recomputeActuals(record, rates) {
+// Each category's actual spending in HUF: the sum of its entries at the month's rates.
+function recomputeActuals(record) {
   CATEGORY_ORDER.forEach((key) => {
     const entries = record.entries.filter((entry) => entry.category === key);
-    const total = entries.reduce((sum, entry) => sum + toHuf(entry.amount, entry.currency, rates), 0);
+    const total = entries.reduce((sum, entry) => sum + toHuf(entry.amount, entry.currency, record.rates), 0);
     record.categories[key].actual = roundCents(total);
   });
 }
@@ -126,10 +134,22 @@ function isEntry(entry) {
     && typeof entry.amount === 'number' && Number.isFinite(entry.amount) && entry.amount > 0;
 }
 
+// A rate that is a positive number, else the fallback's, else 0.
+function readRates(saved, fallback = {}) {
+  const rates = {};
+  RATE_CODES.forEach((code) => {
+    const value = (saved || {})[code];
+    rates[code] = numberOr(value, 0) > 0 ? value : numberOr(fallback[code], 0);
+  });
+  return rates;
+}
+
 // Copies one saved month onto a fresh one, so a missing or broken field becomes
-// 0 instead of crashing the app.
-function normaliseMonth(parsed, fallbackMonth) {
+// 0 instead of crashing the app. A month saved without rates (before each month
+// had its own) gets fallbackRates, the rates that were used for every month then.
+function normaliseMonth(parsed, fallbackMonth, fallbackRates) {
   const record = makeEmptyMonth(typeof parsed.month === 'string' ? parsed.month : fallbackMonth);
+  record.rates = readRates(parsed.rates, fallbackRates);
   record.carryOver = numberOr(parsed.carryOver, 0);
   record.income = numberOr(parsed.income, 0);
   const mustPays = parsed.mustPays || {};
@@ -175,15 +195,34 @@ function normaliseState(parsed) {
   if (Array.isArray(parsed.pastMonths)) {
     state.pastMonths = parsed.pastMonths
       .filter((m) => m && typeof m === 'object' && typeof m.month === 'string')
-      .map((m) => normaliseMonth(m, m.month))
+      .map((m) => normaliseMonth(m, m.month, state.rates))
       .sort(byMonth);
   }
-  const rates = parsed.rates || {};
-  Object.keys(state.rates).forEach((code) => {
-    state.rates[code] = numberOr(rates[code], 0) > 0 ? rates[code] : 0;
-  });
-  [state, ...state.pastMonths].forEach((record) => recomputeActuals(record, state.rates));
+  if (Array.isArray(parsed.typedRates)) {
+    state.typedRates = parsed.typedRates.filter((code) => RATE_CODES.includes(code) && state.rates[code] > 0);
+  } else {
+    // Saved before rates were fetched: every rate there was typed by the user.
+    state.typedRates = RATE_CODES.filter((code) => state.rates[code] > 0);
+  }
+  state.ratesDate = typeof parsed.ratesDate === 'string' ? parsed.ratesDate : '';
+  fillMissingRates(state);
+  allMonthsOf(state).forEach(recomputeActuals);
   return state;
+}
+
+function allMonthsOf(budget) {
+  return [...budget.pastMonths, budget].sort(byMonth);
+}
+
+// A finished month that never had a rate for a currency (e.g. one added by an
+// imported statement before any rate was known) takes this month's rate, once,
+// and keeps it.
+function fillMissingRates(budget) {
+  budget.pastMonths.forEach((record) => {
+    RATE_CODES.forEach((code) => {
+      if (!(record.rates[code] > 0) && budget.rates[code] > 0) record.rates[code] = budget.rates[code];
+    });
+  });
 }
 
 // Why the saved budget was not loaded, shown above the app; '' when it was.
@@ -295,23 +334,31 @@ function computeLeftover(state) {
 }
 
 // A new month starts empty with the leftover carried over; the finished month
-// is kept in the history.
+// is kept in the history with the rates it ended with. The new month starts
+// from those rates until today's are fetched; a rate typed last month is not
+// kept as typed, so today's rate replaces it.
 function checkAndResetMonth(state) {
   const current = getCurrentMonthStr();
   if (state.month === current) {
     return state;
   }
-  const { pastMonths, rates, ...finished } = state;
+  const { pastMonths, typedRates, ratesDate, ...finished } = state;
   const newState = makeEmptyState(current);
   newState.carryOver = computeLeftover(state);
   newState.pastMonths = [...pastMonths.filter((m) => m.month !== finished.month), finished].sort(byMonth);
-  newState.rates = rates;
+  newState.rates = { ...finished.rates };
+  newState.ratesDate = ratesDate;
   saveState(newState);
   return newState;
 }
 
 // Empty until the saved budget is loaded (see the end of this file).
 let state = makeEmptyState(getCurrentMonthStr());
+
+// Today's rates once fetched ({ MNT, EUR, USD } in HUF), or null; set to true
+// in liveRatesFailed when they could not be fetched.
+let liveRates = null;
+let liveRatesFailed = false;
 
 // The month shown in the history; the current one until another is picked.
 let historyMonth = state.month;
@@ -402,10 +449,34 @@ function renderExpenseCurrencyOptions() {
   select.value = BASE_CURRENCY;
 }
 
+// "14 Nov 2026" from "2026-11-14".
+function formatDay(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${d} ${names[m - 1]} ${y}`;
+}
+
+// Where this month's rates come from: today's, the last ones fetched, or typed.
+function ratesStatusText() {
+  const parts = [];
+  if (liveRates) {
+    parts.push(`Today's rates, ${formatDay(state.ratesDate)}, from Exchange Rate API.`);
+  } else if (liveRatesFailed) {
+    parts.push(state.ratesDate
+      ? `Today's rates could not be fetched; the rates from ${formatDay(state.ratesDate)} are used.`
+      : "Today's rates could not be fetched (are you online?); type the rates yourself.");
+  }
+  if (state.typedRates.length > 0) {
+    parts.push(`Your own rate for ${state.typedRates.join(' and ')}; clear the box to use today's rate.`);
+  }
+  return parts.join(' ');
+}
+
 function renderRates() {
-  Object.keys(state.rates).forEach((code) => {
+  RATE_CODES.forEach((code) => {
     document.getElementById(`rate-${code}`).value = numOrEmpty(state.rates[code]);
   });
+  document.getElementById('rates-status').textContent = ratesStatusText();
 }
 
 // Entries (and statement totals) in a currency without a rate count as 0, so
@@ -414,9 +485,9 @@ function renderRateWarning() {
   const missing = {};
   allMonths().forEach((record) => {
     record.entries.forEach((entry) => {
-      if (rateOf(entry.currency, state.rates) === 0) missing[entry.currency] = (missing[entry.currency] || 0) + 1;
+      if (rateOf(entry.currency, record.rates) === 0) missing[entry.currency] = (missing[entry.currency] || 0) + 1;
     });
-    if ((record.transfers > 0 || record.moneyIn > 0) && rateOf(STATEMENT_CURRENCY, state.rates) === 0) {
+    if ((record.transfers > 0 || record.moneyIn > 0) && rateOf(STATEMENT_CURRENCY, record.rates) === 0) {
       missing[STATEMENT_CURRENCY] = missing[STATEMENT_CURRENCY] || 0;
     }
   });
@@ -469,10 +540,10 @@ function renderCategorySummary() {
 }
 
 // "2640" for HUF; "2640 (24000 MNT)" for another currency; "? (24000 MNT)"
-// while that currency has no rate.
-function amountText(entry) {
+// while that currency has no rate. Converted at the rates of the entry's month.
+function amountText(entry, rates) {
   if (entry.currency === BASE_CURRENCY) return formatAmount(entry.amount);
-  const huf = rateOf(entry.currency, state.rates) > 0 ? formatAmount(toHuf(entry.amount, entry.currency, state.rates)) : '?';
+  const huf = rateOf(entry.currency, rates) > 0 ? formatAmount(toHuf(entry.amount, entry.currency, rates)) : '?';
   return `${huf} (${formatAmount(entry.amount)} ${entry.currency})`;
 }
 
@@ -549,14 +620,14 @@ function renderHistory() {
     row.className = 'history-row';
     appendSpan(row, entry.time || '—', 'history-time');
     appendSpan(row, CATEGORY_LABELS[entry.category], 'history-category');
-    appendSpan(row, amountText(entry), 'history-amount');
+    appendSpan(row, amountText(entry, record.rates), 'history-amount');
     appendSpan(row, SOURCE_LABELS[entry.source], 'history-source');
     if (record === state) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'delete-btn';
       button.textContent = 'Delete';
-      button.setAttribute('aria-label', `Delete ${CATEGORY_LABELS[entry.category]} ${amountText(entry)}`);
+      button.setAttribute('aria-label', `Delete ${CATEGORY_LABELS[entry.category]} ${amountText(entry, record.rates)}`);
       button.addEventListener('click', () => deleteEntry(index));
       row.appendChild(button);
     }
@@ -603,10 +674,15 @@ function renderReport() {
   appendRow(table, ['Income', ...months.map((m) => formatAmount(m.income))]);
   appendRow(table, ['Must-pays', ...months.map((m) => formatAmount(sumMustPays(m)))]);
   if (months.some((m) => m.transfers > 0 || m.moneyIn > 0)) {
-    const huf = (amount) => formatAmount(toHuf(amount, STATEMENT_CURRENCY, state.rates));
-    appendRow(table, ['Transfers out (statement, not counted)', ...months.map((m) => huf(m.transfers))], 'report-aside');
-    appendRow(table, ['Money in (statement, not counted)', ...months.map((m) => huf(m.moneyIn))], 'report-aside');
+    const huf = (amount, m) => formatAmount(toHuf(amount, STATEMENT_CURRENCY, m.rates));
+    appendRow(table, ['Transfers out (statement, not counted)', ...months.map((m) => huf(m.transfers, m))], 'report-aside');
+    appendRow(table, ['Money in (statement, not counted)', ...months.map((m) => huf(m.moneyIn, m))], 'report-aside');
   }
+  // The rate each month was converted at, for every currency that was used.
+  RATE_CODES.filter((code) => months.some((m) => m.entries.some((entry) => entry.currency === code)
+    || (code === STATEMENT_CURRENCY && (m.transfers > 0 || m.moneyIn > 0)))).forEach((code) => {
+    appendRow(table, [`1 ${code} in HUF`, ...months.map((m) => (m.rates[code] > 0 ? String(m.rates[code]) : '?'))], 'report-aside');
+  });
 }
 
 // Everything that shows spending: the summary, the history and the report.
@@ -631,7 +707,7 @@ function renderAll() {
 
 function deleteEntry(index) {
   state.entries.splice(index, 1);
-  recomputeActuals(state, state.rates);
+  recomputeActuals(state);
   saveState(state);
   renderSpending();
 }
@@ -668,19 +744,30 @@ document.getElementById('add-expense-btn').addEventListener('click', () => {
   }
   message.textContent = '';
   state.entries.push({ time: getNowStr(), category, amount, currency, source: 'typed' });
-  recomputeActuals(state, state.rates);
+  recomputeActuals(state);
   saveState(state);
   amountInput.value = '';
   historyMonth = state.month;
   renderSpending();
 });
 
-// A new rate re-converts every month's entries, as the user chose.
-CURRENCIES.filter((code) => code !== BASE_CURRENCY).forEach((code) => {
+// A typed rate is this month's own rate and is not replaced by today's; it
+// re-converts this month only, since finished months keep their rates.
+// Clearing the box goes back to today's rate when it has been fetched.
+RATE_CODES.forEach((code) => {
   document.getElementById(`rate-${code}`).addEventListener('input', (e) => {
-    state.rates[code] = parseRate(e.target.value);
-    allMonths().forEach((record) => recomputeActuals(record, state.rates));
+    const typed = parseRate(e.target.value);
+    state.typedRates = state.typedRates.filter((c) => c !== code);
+    if (typed > 0) {
+      state.rates[code] = typed;
+      state.typedRates.push(code);
+    } else {
+      state.rates[code] = liveRates ? liveRates[code] : 0;
+    }
+    fillMissingRates(state);
+    allMonths().forEach(recomputeActuals);
     saveState(state);
+    document.getElementById('rates-status').textContent = ratesStatusText();
     renderSpending();
   });
 });
@@ -696,7 +783,9 @@ function monthRecord(month) {
   if (month === state.month) return state;
   let record = state.pastMonths.find((m) => m.month === month);
   if (!record) {
+    // An earlier month first seen in a statement is converted at this month's rates.
     record = makeEmptyMonth(month);
+    record.rates = { ...state.rates };
     state.pastMonths.push(record);
     state.pastMonths.sort(byMonth);
   }
@@ -734,7 +823,7 @@ function importStatement(transactions) {
       else addedEarlier += 1;
     }
   });
-  allMonths().forEach((record) => recomputeActuals(record, state.rates));
+  allMonths().forEach(recomputeActuals);
   saveState(state);
   renderSpending();
 
@@ -762,12 +851,59 @@ document.getElementById('statement-input').addEventListener('change', (e) => {
     });
 });
 
+// Today's rates come from Exchange Rate API's free service: no key, updated
+// once a day. The request carries only the currency code HUF, never the budget.
+const RATES_URL = 'https://open.er-api.com/v6/latest/HUF';
+
+// { rates: { MNT, EUR, USD } in HUF for one unit, day: '2026-11-14' }, or null
+// when the rates could not be fetched (offline, or an unexpected answer).
+async function fetchLiveRates() {
+  try {
+    const response = await fetch(RATES_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`rates: ${response.status}`);
+    const data = await response.json();
+    if (data.result !== 'success') throw new Error('rates: no success');
+    const rates = {};
+    RATE_CODES.forEach((code) => {
+      // The service gives units per forint; the app keeps forints per unit.
+      const perHuf = data.rates[code];
+      if (!(typeof perHuf === 'number' && perHuf > 0)) throw new Error(`rates: no ${code}`);
+      rates[code] = Number((1 / perHuf).toPrecision(6));
+    });
+    const day = new Date(data.time_last_update_unix * 1000).toISOString().slice(0, 10);
+    return { rates, day };
+  } catch (err) {
+    return null;
+  }
+}
+
+// Today's rates replace this month's, except the ones the user typed.
+// Without them, the saved rates stay as they are.
+function applyLiveRates(live) {
+  if (!live) {
+    liveRatesFailed = true;
+    renderRates();
+    return;
+  }
+  liveRates = live.rates;
+  state.ratesDate = live.day;
+  RATE_CODES.forEach((code) => {
+    if (!state.typedRates.includes(code)) state.rates[code] = live.rates[code];
+  });
+  fillMissingRates(state);
+  allMonths().forEach(recomputeActuals);
+  saveState(state);
+  renderRates();
+  renderSpending();
+}
+
 // Loads the saved budget, starts a new month if one has begun, and writes the
 // result to the file (the first time, the budget moved from the browser).
+// The page is drawn before today's rates arrive, so it never waits for them.
 // Kept so the tests can wait for it.
 const started = loadState().then((loaded) => {
   state = checkAndResetMonth(loaded);
   saveState(state);
   historyMonth = state.month;
   renderAll();
-});
+}).then(fetchLiveRates).then(applyLiveRates);

@@ -46,8 +46,9 @@
 
     <section id="rates-section">
       <h2>Exchange rates</h2>
-      <p class="hint">The budget is in HUF. Expenses in another currency are converted with these rates;
-        changing a rate updates every month.</p>
+      <p class="hint">The budget is in HUF. Expenses in another currency are converted with today's rates,
+        fetched when the app opens; type your bank's rate to use your own. A finished month keeps the rates it ended with.</p>
+      <p id="rates-status" class="hint"></p>
       <label class="field">
         1 MNT = HUF
         <input type="number" id="rate-MNT" min="0" step="any" placeholder="e.g. 0.11">
@@ -60,6 +61,7 @@
         1 USD = HUF
         <input type="number" id="rate-USD" min="0" step="any" placeholder="e.g. 360">
       </label>
+      <p class="hint"><a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">Rates By Exchange Rate API</a></p>
     </section>
 
     <section id="expense-section">

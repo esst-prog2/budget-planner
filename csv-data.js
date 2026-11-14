@@ -3,7 +3,10 @@
 //
 //   type,month,key,value,time,category,amount,currency,source
 //   current,2026-11,,,,,,,            the month on screen; every other month is past
-//   rate,,MNT,0.11,,,,,               HUF for one unit of the currency
+//   ratesdate,,,2026-11-14,,,,,       the day of the last rates fetched online
+//   rate,2026-11,MNT,0.0914,,,,,      HUF for one unit, per month; "typed" in the
+//                                     last column when the user typed it
+//                                     (older files: no month, one rate for all)
 //   month,2026-11,income,300000,,,,,  also carryOver, rent, phone, transport, transfers, moneyIn
 //   plan,2026-11,food,80000,,,,,
 //   actual,2026-11,food,90000,,,,,    for reading only; recomputed from the entries on load
@@ -24,9 +27,13 @@ function stateToCsv(state) {
   const rows = [CSV_COLUMNS];
   const row = (values) => rows.push(CSV_COLUMNS.map((column) => values[column]));
   row({ type: 'current', month: state.month });
-  Object.keys(state.rates).forEach((code) => row({ type: 'rate', key: code, value: state.rates[code] }));
+  if (state.ratesDate) row({ type: 'ratesdate', value: state.ratesDate });
   [...state.pastMonths, state].forEach((record) => {
     const { month } = record;
+    Object.keys(record.rates).forEach((code) => row({
+      type: 'rate', month, key: code, value: record.rates[code],
+      source: record === state && (state.typedRates || []).includes(code) ? 'typed' : '',
+    }));
     MONTH_FIELDS.forEach((key) => row({ type: 'month', month, key, value: record[key] }));
     MUST_PAY_FIELDS.forEach((key) => row({ type: 'month', month, key, value: record.mustPays[key] }));
     Object.keys(record.categories).forEach((key) => {
@@ -77,7 +84,11 @@ function csvToState(text) {
   if (!rows || rows.length === 0 || rows[0].join(',') !== CSV_COLUMNS.join(',')) return null;
   const records = {};
   let current = null;
-  const rates = {};
+  let ratesDate = '';
+  // Older files kept one rate for every month, in rows without a month.
+  const legacyRates = {};
+  let hasLegacyRates = false;
+  const typed = {};
   const recordFor = (month) => {
     if (!records[month]) {
       records[month] = { month, mustPays: {}, categories: {}, entries: [], importedIds: [] };
@@ -87,7 +98,8 @@ function csvToState(text) {
   rows.slice(1).forEach((cells) => {
     const r = Object.fromEntries(CSV_COLUMNS.map((column, i) => [column, cells[i] || '']));
     if (r.type === 'current') { current = r.month; recordFor(r.month); return; }
-    if (r.type === 'rate') { rates[r.key] = csvNumber(r.value); return; }
+    if (r.type === 'ratesdate') { ratesDate = r.value; return; }
+    if (r.type === 'rate' && !r.month) { legacyRates[r.key] = csvNumber(r.value); hasLegacyRates = true; return; }
     if (!r.month) return;
     const record = recordFor(r.month);
     if (r.type === 'month') {
@@ -102,17 +114,29 @@ function csvToState(text) {
       });
     } else if (r.type === 'imported') {
       record.importedIds.push(r.key);
+    } else if (r.type === 'rate') {
+      record.rates = record.rates || {};
+      record.rates[r.key] = csvNumber(r.value);
+      if (r.source === 'typed') typed[r.month] = [...(typed[r.month] || []), r.key];
     }
   });
   const months = Object.keys(records).sort();
   if (months.length === 0) return null;
   // Without a "current" row the latest month is the one on screen.
   const shown = current || months[months.length - 1];
-  return {
+  const state = {
     ...records[shown],
     pastMonths: months.filter((month) => month !== shown).map((month) => records[month]),
-    rates,
+    ratesDate,
   };
+  if (hasLegacyRates) {
+    // The one rate was typed by the user and applied to every month; the app
+    // gives it to months without their own (typedRates left out means "typed").
+    state.rates = { ...legacyRates, ...(state.rates || {}) };
+  } else {
+    state.typedRates = typed[shown] || [];
+  }
+  return state;
 }
 
 if (typeof module !== 'undefined') {
