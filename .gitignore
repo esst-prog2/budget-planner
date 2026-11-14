@@ -6,3 +6,6 @@ spike/*-private.csv
 
 # Half-written saves of budget-data.csv
 *.csv.tmp
+
+# The made-up statement for the demo (demo/make-sample-statement.js) is the one exception
+!demo/sample-statement.xlsx
